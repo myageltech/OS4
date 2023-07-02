@@ -15,7 +15,7 @@ typedef struct MallocMetadata
 class MallocManager
 {
 private:
-    MallocManager() : head(nullptr), tail(nullptr), _num_free_blocks(0), _num_free_bytes(0), _num_allocated_blocks(0), _num_allocated_bytes(0), _size_meta_data(sizeof(MallocMetadata)) {}
+    MallocManager() : head(nullptr), tail(nullptr), _num_free_blocks(0), _num_free_bytes(0), _num_allocated_blocks(0), _num_allocated_bytes(0), _num_meta_data_bytes(0) {}
     static MallocMetadata &instance;
 
 public:
@@ -134,27 +134,27 @@ void *srealloc(void *oldp, size_t size)
 
 size_t _num_free_blocks()
 {
-    return MallocManager::getInstance()._num_free_blocks_var;
+    return MallocManager::getInstance()._num_free_blocks;
 }
 
 size_t _num_free_bytes()
 {
-    return MallocManager::getInstance()._num_free_bytes_var;
+    return MallocManager::getInstance()._num_free_bytes;
 }
 
 size_t _num_allocated_blocks()
 {
-    return MallocManager::getInstance()._num_allocated_blocks_var;
+    return MallocManager::getInstance()._num_allocated_blocks;
 }
 
 size_t _num_allocated_bytes()
 {
-    return MallocManager::getInstance()._num_allocated_bytes_var;
+    return MallocManager::getInstance()._num_allocated_bytes;
 }
 
 size_t _num_meta_data_bytes()
 {
-    return MallocManager::getInstance()._num_meta_data_bytes_var;
+    return MallocManager::getInstance()._num_meta_data_bytes;
 }
 
 size_t _size_meta_data()
