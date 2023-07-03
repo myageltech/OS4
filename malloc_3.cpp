@@ -1,6 +1,5 @@
 #include <unistd.h>
 #include <cstring>
-#include <cmath>
 
 #define INITIAL_BLOCK_SIZE 128 * 1024
 #define INITIAL_BLOCKS 32
@@ -10,6 +9,16 @@
 #define BASE 2
 #define MAX_SIZE 100000000
 #define SIZE_CHECK_LIMIT(size) (size > 0 && size <= MAX_SIZE)
+
+int powerOfBase(int power)
+{
+    int res = 1;
+    for (int i = 0; i < power; i++)
+    {
+        res *= BASE;
+    }
+    return res;
+}
 
 typedef struct MallocMetadata
 {
@@ -96,7 +105,7 @@ void *smalloc(size_t size)
 int getBlockOrder(size_t size)
 {
     int order = MIN_ORDER;
-    while (size > BASE_BLOCK_SIZE * pow(BASE, order))
+    while (size > BASE_BLOCK_SIZE * powerOfBase(order))
     {
         order++;
     }
@@ -132,11 +141,11 @@ MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
     {
         return nullptr;
     }
-    //split the block into 2 insert them to the small order list delete the bigger block from the bigger order list and return the first block
+    // split the block into 2 insert them to the small order list delete the bigger block from the bigger order list and return the first block
     MallocMetadata *first_block = bigger_block;
-    MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + (INITIAL_BLOCK_SIZE * pow(BASE, order)));
-    first_block->size = INITIAL_BLOCK_SIZE * pow(BASE, order);
-    second_block->size = INITIAL_BLOCK_SIZE * pow(BASE, order);
+    MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + (INITIAL_BLOCK_SIZE * powerOfBase(order)));
+    first_block->size = INITIAL_BLOCK_SIZE * powerOfBase(order);
+    second_block->size = INITIAL_BLOCK_SIZE * powerOfBase(order);
     first_block->is_free = true;
     second_block->is_free = true;
     first_block->next = second_block;
