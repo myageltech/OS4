@@ -39,7 +39,11 @@ private:
             new_block->next = (i == INITIAL_BLOCKS - 1) ? nullptr : new_block + 1;
             new_block = new_block->next;
         }
-        // free blocks stats
+        _num_free_blocks = INITIAL_BLOCKS;
+        _num_free_bytes = INITIAL_BLOCK_SIZE * INITIAL_BLOCKS;
+        _num_allocated_blocks = INITIAL_BLOCKS;
+        _num_allocated_bytes = INITIAL_BLOCK_SIZE * INITIAL_BLOCKS;
+        _num_meta_data_bytes = INITIAL_BLOCKS * _size_meta_data();
     }
     static MallocMetadata &instance;
 
@@ -71,77 +75,47 @@ void *smalloc(size_t size)
     {
         return NULL;
     }
-    if (size <= INITIAL_BLOCK_SIZE) // challenges 0-2
+    MallocManager &manager = MallocManager::getInstance();
+    int order = getBlockOrder(size);
+    if (order > MAX_ORDER) // size is too big so need mmap()
     {
-        int order = MIN_ORDER;
-        // find the min order that can fit the size
-        while (size > BASE_BLOCK_SIZE * pow(BASE, order))
-        {
-            order++;
-        }
-        // find the first free block in the free list (if exists)
-        MallocManager &manager = MallocManager::getInstance();
-        MallocMetadata *temp = manager.free_list[order];
-        while (temp != nullptr && !temp->is_free)
-        {
-            temp = temp->next;
-        }
-        if (temp == nullptr) // need to break a bigger block
-        {
-        }
-        temp->is_free = false;
-        temp->next->prev = temp->prev;
-        temp->prev->next = temp->next;
-        manager._num_free_blocks--;
-        manager._num_free_bytes -= temp->size;
-        return (void *)((char *)temp + _size_meta_data());
+        return nullptr;
     }
-    else
+    // return a block from the free list
+    MallocMetadata *block = getBlockByOrder(manager.free_list, order);
+    if (block == nullptr)
     {
+        return nullptr;
     }
-    MallocManager::getInstance()._num_allocated_blocks++;
-    MallocManager::getInstance()._num_allocated_bytes += size;
-    MallocManager::getInstance()._num_meta_data_bytes += _size_meta_data();
-    return (void *)((char *)new_block + _size_meta_data());
+    block->is_free = false;
+    manager._num_free_blocks--;
+    manager._num_free_bytes -= block->size;
+    return (void *)((char *)block + _size_meta_data());
 }
 
-// return a block of size INITIAL_BLOCK_SIZE * 2^order, if there isn't one, break a bigger block
-// and return the first block of the new block, and put the rest in the free list
-// if there isn't a bigger block, return nullptr
-// the recursive call break the block into 2, if the halved block is still to big - split it too (but not the other one)
-/* if a pre-allocated block
+int getBlockOrder(size_t size)
+{
+    int order = MIN_ORDER;
+    while (size > BASE_BLOCK_SIZE * pow(BASE, order))
+    {
+        order++;
+    }
+    return order;
+}
+
+/*If we reuse freed memory sectors with bigger sizes than required, we’ll be wasting memory
+(internal fragmentation).
+Solution: Implement a function that smalloc() will use, such that if a pre-allocated block
 is reused and is large enough, the function will cut the block in half to two blocks (buddies)
 with two separate meta-data structs. One will serve the current allocation, and the other will
 remain unused for later (marked free and added to the free blocks data structure). This
 process should be done iteratively until the allocated block is no longer “large enough”.
 Definition of “large enough”: The allocated block is large enough if it is of order > 0, and if
 after splitting it to two equal sized blocks, the requested user allocation is small enough to
-fit entirely inside the first block, so the second block will be free*/
+fit entirely inside the first block, so the second block will be free.
+*/
 MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
 {
-    if (blocks_list[order] != nullptr)
-    {
-        return blocks_list[order];
-    }
-    if (order == MAX_ORDER)
-    {
-        return nullptr;
-    }
-    MallocMetadata *bigger_block = getBlockByOrder(blocks_list, order + 1);
-    if (bigger_block == nullptr)
-    {
-        return nullptr;
-    }
-    // split the bigger block into 2 blocks
-    bigger_block->is_free = true;
-    bigger_block->size /= 2;
-    MallocMetadata *new_block = bigger_block + bigger_block->size;
-    new_block->is_free = true;
-    new_block->size = bigger_block->size;
-    new_block->next = nullptr;
-    new_block->prev = nullptr;
-    blocks_list[order] = bigger_block;
-    return bigger_block;
 }
 void mergeBlocks() {}
 
