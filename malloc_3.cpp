@@ -1,6 +1,13 @@
 #include <unistd.h>
 #include <cstring>
+#include <cmath>
 
+#define INITIAL_BLOCK_SIZE 128 * 1024
+#define INITIAL_BLOCKS 32
+#define BASE_BLOCK_SIZE 128
+#define MIN_ORDER 0
+#define MAX_ORDER 10
+#define BASE 2
 #define MAX_SIZE 100000000
 #define SIZE_CHECK_LIMIT(size) (size > 0 && size <= MAX_SIZE)
 
@@ -15,12 +22,32 @@ typedef struct MallocMetadata
 class MallocManager
 {
 private:
-    MallocManager() : head(nullptr), tail(nullptr), _num_free_blocks(0), _num_free_bytes(0), _num_allocated_blocks(0), _num_allocated_bytes(0), _num_meta_data_bytes(0) {}
+    MallocManager() : /*head(nullptr), tail(nullptr),*/ _num_free_blocks(0), _num_free_bytes(0),
+                      _num_allocated_blocks(0), _num_allocated_bytes(0), _num_meta_data_bytes(0)
+    {
+        for (int i = 0; i < MAX_ORDER + 1; i++)
+        {
+            free_list[i] = nullptr;
+        }
+        free_list[MAX_ORDER] = (MallocMetadata *)sbrk(INITIAL_BLOCK_SIZE * INITIAL_BLOCKS);
+        MallocMetadata *new_block = free_list[MAX_ORDER];
+        for (int i = 0; i < INITIAL_BLOCKS; i++)
+        {
+            new_block->size = INITIAL_BLOCK_SIZE;
+            new_block->is_free = true;
+            new_block->prev = (i == 0) ? nullptr : new_block - 1;
+            new_block->next = (i == INITIAL_BLOCKS - 1) ? nullptr : new_block + 1;
+            new_block = new_block->next;
+        }
+        // free blocks stats
+    }
     static MallocMetadata &instance;
 
 public:
-    MallocMetadata *head;
-    MallocMetadata *tail;
+    // MallocMetadata *head;
+    // MallocMetadata *tail;
+
+    MallocMetadata *free_list[MAX_ORDER + 1];
 
     size_t _num_free_blocks;
     size_t _num_free_bytes;
@@ -39,6 +66,86 @@ public:
 };
 
 void *smalloc(size_t size)
+{
+    if (!SIZE_CHECK_LIMIT(size))
+    {
+        return NULL;
+    }
+    if (size <= INITIAL_BLOCK_SIZE) // challenges 0-2
+    {
+        int order = MIN_ORDER;
+        // find the min order that can fit the size
+        while (size > BASE_BLOCK_SIZE * pow(BASE, order))
+        {
+            order++;
+        }
+        // find the first free block in the free list (if exists)
+        MallocManager &manager = MallocManager::getInstance();
+        MallocMetadata *temp = manager.free_list[order];
+        while (temp != nullptr && !temp->is_free)
+        {
+            temp = temp->next;
+        }
+        if (temp == nullptr) // need to break a bigger block
+        {
+        }
+        temp->is_free = false;
+        temp->next->prev = temp->prev;
+        temp->prev->next = temp->next;
+        manager._num_free_blocks--;
+        manager._num_free_bytes -= temp->size;
+        return (void *)((char *)temp + _size_meta_data());
+    }
+    else
+    {
+    }
+    MallocManager::getInstance()._num_allocated_blocks++;
+    MallocManager::getInstance()._num_allocated_bytes += size;
+    MallocManager::getInstance()._num_meta_data_bytes += _size_meta_data();
+    return (void *)((char *)new_block + _size_meta_data());
+}
+
+// return a block of size INITIAL_BLOCK_SIZE * 2^order, if there isn't one, break a bigger block
+// and return the first block of the new block, and put the rest in the free list
+// if there isn't a bigger block, return nullptr
+// the recursive call break the block into 2, if the halved block is still to big - split it too (but not the other one)
+/* if a pre-allocated block
+is reused and is large enough, the function will cut the block in half to two blocks (buddies)
+with two separate meta-data structs. One will serve the current allocation, and the other will
+remain unused for later (marked free and added to the free blocks data structure). This
+process should be done iteratively until the allocated block is no longer “large enough”.
+Definition of “large enough”: The allocated block is large enough if it is of order > 0, and if
+after splitting it to two equal sized blocks, the requested user allocation is small enough to
+fit entirely inside the first block, so the second block will be free*/
+MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
+{
+    if (blocks_list[order] != nullptr)
+    {
+        return blocks_list[order];
+    }
+    if (order == MAX_ORDER)
+    {
+        return nullptr;
+    }
+    MallocMetadata *bigger_block = getBlockByOrder(blocks_list, order + 1);
+    if (bigger_block == nullptr)
+    {
+        return nullptr;
+    }
+    // split the bigger block into 2 blocks
+    bigger_block->is_free = true;
+    bigger_block->size /= 2;
+    MallocMetadata *new_block = bigger_block + bigger_block->size;
+    new_block->is_free = true;
+    new_block->size = bigger_block->size;
+    new_block->next = nullptr;
+    new_block->prev = nullptr;
+    blocks_list[order] = bigger_block;
+    return bigger_block;
+}
+void mergeBlocks() {}
+
+/*void *smalloc(size_t size)
 {
     if (!SIZE_CHECK_LIMIT(size))
     {
@@ -80,7 +187,7 @@ void *smalloc(size_t size)
     MallocManager::getInstance()._num_allocated_bytes += size;
     MallocManager::getInstance()._num_meta_data_bytes += _size_meta_data();
     return (void *)((char *)new_block + _size_meta_data());
-}
+}*/
 
 void *scalloc(size_t num, size_t size)
 {
