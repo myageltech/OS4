@@ -111,7 +111,7 @@ void *smalloc(size_t size)
 int getOrder(size_t size)
 {
     int order = MIN_ORDER;
-    while (size > BASE_BLOCK_SIZE * powerOfBase(order))
+    while (size + _size_meta_data()> BASE_BLOCK_SIZE * powerOfBase(order))
     {
         order++;
     }
@@ -220,12 +220,54 @@ void *scalloc(size_t num, size_t size)
 
 void sfree(void *p)
 {
+    MallocMetadata* block = (MallocMetadata *)((char *)p - _size_meta_data());
     //check if nightbor is free with xor and merge
-    MallocMetadata *buddy = (MallocMetadata *)((unsigned long)p ^ ((MallocMetadata *)p)->size);
-    
+    MallocMetadata *buddy = (MallocMetadata *)((unsigned long)block ^ ((MallocMetadata *)block)->size);
+    if (buddy->is_free)
+    {
+        //merge
+        //if buddy is head
+        removeBlockFromFreeList(buddy);
+        //remove buddy from free list
+        block->size *= BASE;
+    }
+    addBlockToFreeList(block);
+}
 
+void addBlockToFreeList(MallocMetadata *block)
+{
+    MallocManager &manager = MallocManager::getInstance();
+    int order = getOrder(block->size);
+    block->is_free = true;
+    block->next = manager.free_list[order];
+    block->prev = nullptr;
+    if (manager.free_list[order] != nullptr)
+    {
+        manager.free_list[order]->prev = block;
+    }
+    manager.free_list[order] = block;
+    manager._num_free_blocks++;
+    manager._num_free_bytes += block->size;
+}
 
-
+void removeBlockFromFreeList(MallocMetadata *block)
+{
+    MallocManager &manager = MallocManager::getInstance();
+    int order = getOrder(block->size);
+    if (block->prev == nullptr)
+    {
+        manager.free_list[order] = block->next;
+    }
+    else
+    {
+        block->prev->next = block->next;
+    }
+    if (block->next != nullptr)
+    {
+        block->next->prev = block->prev;
+    }
+    manager._num_free_blocks--;
+    manager._num_free_bytes -= block->size;
 }
 
 /**
