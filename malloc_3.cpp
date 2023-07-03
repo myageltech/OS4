@@ -38,7 +38,13 @@ private:
         {
             free_list[i] = nullptr;
         }
-        free_list[MAX_ORDER] = (MallocMetadata *)sbrk(INITIAL_BLOCK_SIZE * INITIAL_BLOCKS);
+        //a hack to make sure the first block is aligned to 128 bytes (im scared of the alignment)
+        unsigned long p = (unsigned long)sbrk(0);
+        unsigned long extra_room = INITIAL_BLOCK_SIZE * INITIAL_BLOCKS - p % (INITIAL_BLOCK_SIZE * INITIAL_BLOCKS);
+        free_list[MAX_ORDER] = (MallocMetadata *)sbrk(INITIAL_BLOCK_SIZE * INITIAL_BLOCKS + extra_room);
+        // free_list[MAX_ORDER] += (char *)extra_room; 
+        // shift free_list[MAX_ORDER] to the right by extra_room
+        free_list[MAX_ORDER] = (MallocMetadata *)((char *)free_list[MAX_ORDER] + extra_room);
         MallocMetadata *new_block = free_list[MAX_ORDER];
         for (int i = 0; i < INITIAL_BLOCKS; i++)
         {
@@ -85,7 +91,7 @@ void *smalloc(size_t size)
         return NULL;
     }
     MallocManager &manager = MallocManager::getInstance();
-    int order = getBlockOrder(size);
+    int order = getOrder(size);
     if (order > MAX_ORDER) // size is too big so need mmap()
     {
         return nullptr;
@@ -102,7 +108,7 @@ void *smalloc(size_t size)
     return (void *)((char *)block + _size_meta_data());
 }
 
-int getBlockOrder(size_t size)
+int getOrder(size_t size)
 {
     int order = MIN_ORDER;
     while (size > BASE_BLOCK_SIZE * powerOfBase(order))
@@ -214,6 +220,18 @@ void *scalloc(size_t num, size_t size)
 
 void sfree(void *p)
 {
+    //check if nightbor is free with xor and merge
+    MallocMetadata *buddy = (MallocMetadata *)((unsigned long)p ^ ((MallocMetadata *)p)->size);
+    
+
+
+
+}
+
+/**
+ * @brief 
+ * void sfree(void *p)
+{
     if (p == NULL)
     {
         return;
@@ -229,6 +247,11 @@ void sfree(void *p)
     manager._num_free_bytes += temp->size;
     return;
 }
+ * 
+ * @param oldp 
+ * @param size 
+ * @return void* 
+ */
 
 void *srealloc(void *oldp, size_t size)
 {
