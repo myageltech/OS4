@@ -234,20 +234,45 @@ void sfree(void *p)
     addBlockToFreeList(block);
 }
 
-void addBlockToFreeList(MallocMetadata *block)
+// join 2 blocks to one block and add them to the free list and use addBlockToFreeList recursively
+MallocMetadata* addBlockToFreeList(MallocMetadata *block)
 {
     MallocManager &manager = MallocManager::getInstance();
     int order = getOrder(block->size);
-    block->is_free = true;
-    block->next = manager.free_list[order];
-    block->prev = nullptr;
-    if (manager.free_list[order] != nullptr)
+    if (order == MAX_ORDER)
     {
-        manager.free_list[order]->prev = block;
+        return block;
     }
-    manager.free_list[order] = block;
-    manager._num_free_blocks++;
-    manager._num_free_bytes += block->size;
+    MallocMetadata *buddy = (MallocMetadata *)((unsigned long)block ^ ((MallocMetadata *)block)->size);
+    if (buddy->is_free)
+    {
+        //merge
+        //if buddy is head
+        removeBlockFromFreeList(buddy);
+        //remove buddy from free list
+        block->size *= BASE;
+        return addBlockToFreeList(block);
+    }
+    else
+    {
+        //add block to free list
+        if (manager.free_list[order] == nullptr)
+        {
+            manager.free_list[order] = block;
+            block->next = nullptr;
+            block->prev = nullptr;
+        }
+        else
+        {
+            block->next = manager.free_list[order];
+            block->prev = nullptr;
+            manager.free_list[order]->prev = block;
+            manager.free_list[order] = block;
+        }
+        manager._num_free_blocks++;
+        manager._num_free_bytes += block->size;
+        return block;
+    }
 }
 
 void removeBlockFromFreeList(MallocMetadata *block)
@@ -302,19 +327,40 @@ void *srealloc(void *oldp, size_t size)
         return smalloc(size);
     }
     MallocMetadata *temp = (MallocMetadata *)((char *)oldp - _size_meta_data());
-    if (temp->size >= size)
+    if (temp->size >= size + _size_meta_data())
     {
         return oldp;
     }
-    void *newp = smalloc(size);
-    if (newp == NULL)
+    // is there buddies to merge?
+    if (/* condition */)
     {
-        return NULL;
+        //if yes merge
+        /* code */
     }
-    memcpy(newp, oldp, temp->size);
-    sfree(oldp);
-    return newp;
+    
 }
+
+
+// void *srealloc(void *oldp, size_t size)
+// {
+//     if (oldp == NULL)
+//     {
+//         return smalloc(size);
+//     }
+//     MallocMetadata *temp = (MallocMetadata *)((char *)oldp - _size_meta_data());
+//     if (temp->size >= size)
+//     {
+//         return oldp;
+//     }
+//     void *newp = smalloc(size);
+//     if (newp == NULL)
+//     {
+//         return NULL;
+//     }
+//     memcpy(newp, oldp, temp->size);
+//     sfree(oldp);
+//     return newp;
+// }
 
 size_t _num_free_blocks()
 {
