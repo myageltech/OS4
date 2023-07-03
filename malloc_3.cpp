@@ -116,6 +116,35 @@ fit entirely inside the first block, so the second block will be free.
 */
 MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
 {
+    if (blocks_list[order] != nullptr)
+    {
+        MallocMetadata *temp = blocks_list[order];
+        blocks_list[order] = blocks_list[order]->next;
+        temp->is_free = false;
+        return temp;
+    }
+    if (order == MAX_ORDER)
+    {
+        return nullptr;
+    }
+    MallocMetadata *bigger_block = getBlockByOrder(blocks_list, order + 1);
+    if (bigger_block == nullptr)
+    {
+        return nullptr;
+    }
+    //split the block into 2 insert them to the small order list delete the bigger block from the bigger order list and return the first block
+    MallocMetadata *first_block = bigger_block;
+    MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + (INITIAL_BLOCK_SIZE * pow(BASE, order)));
+    first_block->size = INITIAL_BLOCK_SIZE * pow(BASE, order);
+    second_block->size = INITIAL_BLOCK_SIZE * pow(BASE, order);
+    first_block->is_free = true;
+    second_block->is_free = true;
+    first_block->next = second_block;
+    second_block->next = nullptr;
+    first_block->prev = nullptr;
+    second_block->prev = first_block;
+    blocks_list[order] = first_block;
+    return first_block;
 }
 void mergeBlocks() {}
 

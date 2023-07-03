@@ -1,0 +1,3 @@
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/CMakeFiles/catch2-populate.dir
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/CMakeFiles/edit_cache.dir
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/CMakeFiles/rebuild_cache.dir

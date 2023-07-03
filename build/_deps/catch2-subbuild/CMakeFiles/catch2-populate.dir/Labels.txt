@@ -1,0 +1,14 @@
+# Target labels
+ catch2-populate
+# Source files and their labels
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/CMakeFiles/catch2-populate
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/CMakeFiles/catch2-populate.rule
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/CMakeFiles/catch2-populate-complete.rule
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-build.rule
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-configure.rule
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-download.rule
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-install.rule
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-mkdir.rule
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-patch.rule
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-test.rule
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-update.rule
