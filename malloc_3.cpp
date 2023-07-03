@@ -161,7 +161,7 @@ MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
     blocks_list[order] = first_block;
     return first_block;
 }
-void mergeBlocks() {}
+// void mergeBlocks() {}
 
 /*void *smalloc(size_t size)
 {
@@ -326,18 +326,53 @@ void *srealloc(void *oldp, size_t size)
     {
         return smalloc(size);
     }
-    MallocMetadata *temp = (MallocMetadata *)((char *)oldp - _size_meta_data());
-    if (temp->size >= size + _size_meta_data())
+    MallocMetadata *old_block = (MallocMetadata *)((char *)oldp - _size_meta_data());
+    if (old_block->size >= size + _size_meta_data())
     {
         return oldp;
     }
     // is there buddies to merge?
-    if (/* condition */)
+    // if yes merge
+    // int iterations = (size + _size_meta_data()) / old_block->size - ((size + _size_meta_data())%old_block->size == 0);
+    if (buddiesMergeCounter(old_block, size) + getOrder(old_block->size) > getOrder(size))
     {
-        //if yes merge
-        /* code */
+        mergeBudies(old_block, getOrder(size) - getOrder(old_block->size));
+    }
+    else
+    {
+        //smalloc new block
+        smalloc(size);
+        //copy data
+        memset(oldp, 0, old_block->size);
+        //sfree old block
+        sfree(oldp);
     }
     
+}
+
+void mergeBudies(MallocMetadata *old_block, int num_of_iterations){
+    MallocMetadata *buddy = (MallocMetadata *)((unsigned long)old_block ^ ((MallocMetadata *)old_block)->size);
+    for (int i = 0; i < num_of_iterations; i++)
+    {
+        removeBlockFromFreeList(buddy);
+        old_block->size *= BASE;
+        buddy = (MallocMetadata *)((unsigned long)old_block ^ ((MallocMetadata *)old_block)->size);
+    }
+    addBlockToFreeList(old_block);
+}
+
+
+int buddiesMergeCounter(MallocMetadata * old_block, size_t size){
+    int counter = 0;
+    int order = getOrder(size);
+    MallocMetadata *buddy = (MallocMetadata *)((unsigned long)old_block ^ ((MallocMetadata *)old_block)->size);
+    while (buddy->is_free && order < MAX_ORDER)
+    {
+        counter++;
+        order++;
+        buddy = (MallocMetadata *)((unsigned long)buddy ^ ((MallocMetadata *)buddy)->size * BASE);
+    }
+    return counter;
 }
 
 
