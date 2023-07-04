@@ -12,15 +12,24 @@
 #define MAX_SIZE 1e8
 #define SIZE_CHECK_LIMIT(size) (size > 0 && size <= MAX_SIZE)
 
-int powerOfBase(int power)
-{
-    int res = 1;
-    for (int i = 0; i < power; i++)
-    {
-        res *= BASE;
-    }
-    return res;
-}
+int powerOfBase(int power);
+int getOrder(size_t size);
+MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order);
+MallocMetadata *addBlockToFreeList(MallocMetadata *block);
+void removeBlockFromFreeList(MallocMetadata *block);
+void mergeBudies(MallocMetadata *old_block, int num_of_iterations);
+int buddiesMergeCounter(MallocMetadata *old_block, size_t size);
+void tasteCookie(MallocMetadata *block);
+void *smalloc(size_t size);
+void *scalloc(size_t num, size_t size);
+void sfree(void *p);
+void *srealloc(void *oldp, size_t size);
+size_t _num_free_blocks();
+size_t _num_free_bytes();
+size_t _num_allocated_blocks();
+size_t _num_allocated_bytes();
+size_t _num_meta_data_bytes();
+size_t _size_meta_data();
 
 typedef struct MallocMetadata
 {
@@ -376,4 +385,14 @@ size_t _num_meta_data_bytes()
 size_t _size_meta_data()
 {
     return sizeof(MallocMetadata);
+}
+
+int powerOfBase(int power)
+{
+    int res = 1;
+    for (int i = 0; i < power; i++)
+    {
+        res *= BASE;
+    }
+    return res;
 }
