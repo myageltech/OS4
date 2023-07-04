@@ -12,6 +12,8 @@
 #define MAX_SIZE 1e8
 #define SIZE_CHECK_LIMIT(size) (size > 0 && size <= MAX_SIZE)
 
+typedef struct MallocMetadata MallocMetadata;
+
 int powerOfBase(int power);
 int getOrder(size_t size);
 MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order);
@@ -31,19 +33,19 @@ size_t _num_allocated_bytes();
 size_t _num_meta_data_bytes();
 size_t _size_meta_data();
 
-typedef struct MallocMetadata
+struct MallocMetadata
 {
     int cookies;
     size_t size;
     bool is_free;
     MallocMetadata *next;
     MallocMetadata *prev;
-} MallocMetadata;
+};
 
 class MallocManager
 {
 private:
-    MallocManager() : major_cookie(0), (nullptr), /*tail_map(nullptr),*/ _num_free_blocks(0), _num_free_bytes(0),
+    MallocManager() : major_cookie(0), head_map(nullptr), /*tail_map(nullptr),*/ _num_free_blocks(0), _num_free_bytes(0),
                       _num_allocated_blocks(0), _num_allocated_bytes(0), _num_meta_data_bytes(0)
     {
         major_cookie = rand();
@@ -117,8 +119,8 @@ void *smalloc(size_t size)
     int order = getOrder(size);
     if (order > MAX_ORDER) // size is too big so need mmap()
     {
-        MallocMetadata *block = mmap(nullptr, size + _size_meta_data(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-        MallocMetadata temp = {size, false, manager.head_map, nullptr};
+        MallocMetadata *block = (MallocMetadata *)mmap(nullptr, size + _size_meta_data(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        MallocMetadata temp = {MallocManager::getInstance().major_cookie, (int)size, false, manager.head_map, nullptr};
         *block = temp;
         manager.head_map = block;
         return (void *)((char *)block + _size_meta_data());
@@ -245,7 +247,7 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
         removeBlockFromFreeList(buddy);
         // remove buddy from free list
         block->size *= BASE;
-        return addBlockToFreeList(block);
+        return addBlockToFreeList((MallocMetadata *)block);
     }
     else
     {
