@@ -1,5 +1,12 @@
 #include <iostream>
-#include "malloc_3.cpp"
+
+#include "my_stdlib.h"
+#include <catch2/catch_test_macros.hpp>
+
+#include <unistd.h>
+#include <cmath>
+#include <sys/wait.h>
+#include <unistd.h>
 
 int main(int argc, char const *argv[])
 {
