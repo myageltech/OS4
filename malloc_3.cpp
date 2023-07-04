@@ -333,6 +333,12 @@ void *smalloc(size_t size)
     manager._num_free_blocks--;
     manager._num_free_bytes -= block->size;
     std::cout << "before return" << std::endl;
+    std::cout << "block size: " << block->size << std::endl;
+    std::cout << "block order" << getOrder(block->size) << std::endl;
+    std::cout << "block cookie: " << block->cookies << std::endl;
+    std::cout << "block is free: " << block->is_free << std::endl;
+    std::cout << "block next: " << block->next << std::endl;
+    std::cout << "block prev: " << block->prev << std::endl;
     return (void *)((char *)block + _size_meta_data());
 }
 
