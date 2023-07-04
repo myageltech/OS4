@@ -12,6 +12,8 @@
 #define MAX_SIZE 1e8
 #define SIZE_CHECK_LIMIT(size) (size > 0 && size <= MAX_SIZE)
 
+size_t _size_meta_data();
+
 typedef struct MallocMetadata
 {
     int cookies;
@@ -180,6 +182,30 @@ MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
     return first_block;
 }
 
+void removeBlockFromFreeList(MallocMetadata *block)
+{
+    MallocManager &manager = MallocManager::getInstance();
+    if (block->cookies != manager.major_cookie)
+    {
+        exit(0xdeadbeef);
+    }
+    int order = getOrder(block->size);
+    if (block->prev == nullptr)
+    {
+        manager.free_list[order] = block->next;
+    }
+    else
+    {
+        block->prev->next = block->next;
+    }
+    if (block->next != nullptr)
+    {
+        block->next->prev = block->prev;
+    }
+    manager._num_free_blocks--;
+    manager._num_free_bytes -= block->size;
+}
+
 // join 2 blocks to one block and add them to the free list and use addBlockToFreeList recursively
 MallocMetadata *addBlockToFreeList(MallocMetadata *block)
 {
@@ -222,31 +248,6 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
         manager._num_free_bytes += block->size;
         return block;
     }
-}
-
-void removeBlockFromFreeList(MallocMetadata *block)
-{
-    MallocManager &manager = MallocManager::getInstance();
-    if (block->cookies != manager.major_cookie)
-    {
-        exit(0xdeadbeef);
-    }
-    MallocManager &manager = MallocManager::getInstance();
-    int order = getOrder(block->size);
-    if (block->prev == nullptr)
-    {
-        manager.free_list[order] = block->next;
-    }
-    else
-    {
-        block->prev->next = block->next;
-    }
-    if (block->next != nullptr)
-    {
-        block->next->prev = block->prev;
-    }
-    manager._num_free_blocks--;
-    manager._num_free_bytes -= block->size;
 }
 
 void mergeBudies(MallocMetadata *old_block, int num_of_iterations)
