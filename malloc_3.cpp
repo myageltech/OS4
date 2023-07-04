@@ -291,7 +291,7 @@ void *smalloc(size_t size)
     if (order > MAX_ORDER) // size is too big so need mmap()
     {
         MallocMetadata *block = (MallocMetadata *)mmap(nullptr, size + _size_meta_data(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-        MallocMetadata temp = {MallocManager::getInstance().major_cookie, (int)size, false, manager.head_map, nullptr};
+        MallocMetadata temp = {MallocManager::getInstance().major_cookie, (unsigned long)size, false, manager.head_map, nullptr};
         *block = temp;
         manager.head_map = block;
         return (void *)((char *)block + _size_meta_data());

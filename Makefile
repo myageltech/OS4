@@ -9,7 +9,7 @@ test_1: malloc_1.cpp test_1.cpp
 test_2: malloc_2.cpp test_2.cpp
 	$(CC) $(CFLAGS) $^ -o $@
 
-test_3: malloc_3.cpp
+test_3: malloc_3.cpp test_3.cpp
 	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
