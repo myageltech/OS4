@@ -41,9 +41,13 @@ int main(int argc, char const *argv[])
         std::cout << "Got: " << p << std::endl;
     }
     else{
+
     std::cout << "Sfree Test Passed!" << std::endl;
     }
     std::cout << "|-----------------------------------|" << std::endl;
+    std::cout << "the size should be" << sizeof(int) << std::endl;
+    std::cout << "the order should be" << 0 << std::endl;
+    std::cout << "is free shoud be" << "false" << std::endl;
     
     // // test cookies for smalloc if they are not overwritten
     // std::cout << "|-----------------------------------|" << std::endl;

@@ -121,12 +121,12 @@ size_t _size_meta_data()
 
 int powerOfBase(int power)
 {
-    int res = 1;
+    int result = 1;
     for (int i = 0; i < power; i++)
     {
-        res *= BASE;
+        result *= BASE;
     }
-    return res;
+    return result;
 }
 
 void tasteCookie(MallocMetadata *block)
@@ -142,13 +142,11 @@ void tasteCookie(MallocMetadata *block)
 
 int getOrder(size_t size)
 {
-    std::cout << "get order: " << size << std::endl;
+    std::cout << "get size: " << size << std::endl;
     int order = MIN_ORDER;
-    while (size + _size_meta_data() > BASE_BLOCK_SIZE * powerOfBase(order))
+    while (size> BASE_BLOCK_SIZE * powerOfBase(order))
     {
-        std::cout << "get order: " << size << std::endl;
-        std::cout << "get order: " << BASE_BLOCK_SIZE * powerOfBase(order) << std::endl;
-
+        std::cout << "get order: " << order << std::endl;
         order++;
     }
     std::cout << "get order: " << order << std::endl;
@@ -307,7 +305,7 @@ void *smalloc(size_t size)
     std::cout << "smalloc: " << size << std::endl;
     MallocManager &manager = MallocManager::getInstance();
     std::cout << "after get instance" << std::endl;
-    int order = getOrder(size);
+    int order = getOrder(size + _size_meta_data());
     std::cout << "after get order" << std::endl;
     std::cout << "order: " << order << std::endl;
     if (order > MAX_ORDER) // size is too big so need mmap()
@@ -395,9 +393,9 @@ void *srealloc(void *oldp, size_t size)
     // is there buddies to merge?
     // if yes merge
     // int iterations = (size + _size_meta_data()) / old_block->size - ((size + _size_meta_data())%old_block->size == 0);
-    if (old_block->size <= INITIAL_BLOCK_SIZE && buddiesMergeCounter(old_block, size) + getOrder(old_block->size) > getOrder(size))
+    if (old_block->size <= INITIAL_BLOCK_SIZE && buddiesMergeCounter(old_block, size + _size_meta_data()) + getOrder(old_block->size) > getOrder(size + _size_meta_data()))
     {
-        mergeBudies(old_block, getOrder(size) - getOrder(old_block->size));
+        mergeBudies(old_block, getOrder(size + _size_meta_data()) - getOrder(old_block->size));
         return oldp;
     }
     else
