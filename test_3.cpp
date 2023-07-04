@@ -1,8 +1,6 @@
 #include <iostream>
 
 #include "my_stdlib.h"
-#include <catch2/catch_test_macros.hpp>
-
 #include <unistd.h>
 #include <cmath>
 #include <sys/wait.h>
