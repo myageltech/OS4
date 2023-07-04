@@ -129,10 +129,13 @@ int powerOfBase(int power)
 
 void tasteCookie(MallocMetadata *block)
 {
+    std::cout << "taste cookie" << std::endl;
     if (block->cookies != MallocManager::getInstance().major_cookie)
     {
+        std::cout << "cookie: " << block->cookies << std::endl;
         exit(0xdeadbeef);
     }
+    std::cout << "after taste cookie" << std::endl;
 }
 
 int getOrder(size_t size)
