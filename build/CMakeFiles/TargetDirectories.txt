@@ -1,0 +1,2 @@
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/CMakeFiles/edit_cache.dir
+/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build/CMakeFiles/rebuild_cache.dir

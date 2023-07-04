@@ -2,6 +2,7 @@
 #include <cstring>
 #include <sys/mman.h>
 #include <cstdlib>
+#include <iostream>
 
 #define INITIAL_BLOCK_SIZE 128 * 1024
 #define INITIAL_BLOCKS 32
@@ -26,6 +27,7 @@ typedef struct MallocMetadata
 class MallocManager
 {
 private:
+
     MallocManager() : major_cookie(0), head_map(nullptr), /*tail_map(nullptr),*/ _num_free_blocks(0), _num_free_bytes(0),
                       _num_allocated_blocks(0), _num_allocated_bytes(0), _num_meta_data_bytes(0)
     {
@@ -57,7 +59,8 @@ private:
         _num_allocated_bytes = INITIAL_BLOCK_SIZE * INITIAL_BLOCKS;
         _num_meta_data_bytes = INITIAL_BLOCKS * _size_meta_data();
     }
-    static MallocMetadata &instance;
+    
+    // static MallocManager &instance;
 
 public:
     int major_cookie;
@@ -76,7 +79,9 @@ public:
     void operator=(MallocManager const &) = delete;
     static MallocManager &getInstance()
     {
+        std::cout << "get instance" << std::endl;
         static MallocManager instance;
+        std::cout << "after get instance" << std::endl;
         return instance;
     }
     ~MallocManager() = default;
@@ -132,11 +137,16 @@ void tasteCookie(MallocMetadata *block)
 
 int getOrder(size_t size)
 {
+    std::cout << "get order: " << size << std::endl;
     int order = MIN_ORDER;
     while (size + _size_meta_data() > BASE_BLOCK_SIZE * powerOfBase(order))
     {
+        std::cout << "get order: " << size << std::endl;
+        std::cout << "get order: " << BASE_BLOCK_SIZE * powerOfBase(order) << std::endl;
+
         order++;
     }
+    std::cout << "get order: " << order << std::endl;
     return order;
 }
 
@@ -282,12 +292,17 @@ int buddiesMergeCounter(MallocMetadata *old_block, size_t size)
 
 void *smalloc(size_t size)
 {
+    std::cout << "smalloc: " << size << std::endl;
     if (!SIZE_CHECK_LIMIT(size))
     {
         return NULL;
     }
+    std::cout << "smalloc: " << size << std::endl;
     MallocManager &manager = MallocManager::getInstance();
+    std::cout << "after get instance" << std::endl;
     int order = getOrder(size);
+    std::cout << "after get order" << std::endl;
+    std::cout << "order: " << order << std::endl;
     if (order > MAX_ORDER) // size is too big so need mmap()
     {
         MallocMetadata *block = (MallocMetadata *)mmap(nullptr, size + _size_meta_data(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -296,16 +311,21 @@ void *smalloc(size_t size)
         manager.head_map = block;
         return (void *)((char *)block + _size_meta_data());
     }
+    std::cout << "found that the size is less then 128 KB" << std::endl;
     // return a block from the free list
     MallocMetadata *block = getBlockByOrder(manager.free_list, order);
+    std::cout << "after get block by order" << std::endl;
     if (block == nullptr)
     {
         return nullptr;
     }
+    std::cout << "found a block in the free list" << std::endl;
     tasteCookie(block);
+    std::cout << "after taste cookie" << std::endl;
     block->is_free = false;
     manager._num_free_blocks--;
     manager._num_free_bytes -= block->size;
+    std::cout << "before return" << std::endl;
     return (void *)((char *)block + _size_meta_data());
 }
 
