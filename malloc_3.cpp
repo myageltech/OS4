@@ -1,5 +1,8 @@
 #include <unistd.h>
 #include <cstring>
+#include <sys/mman.h>
+
+
 
 #define INITIAL_BLOCK_SIZE 128 * 1024
 #define INITIAL_BLOCKS 32
@@ -31,7 +34,7 @@ typedef struct MallocMetadata
 class MallocManager
 {
 private:
-    MallocManager() : /*head(nullptr), tail(nullptr),*/ _num_free_blocks(0), _num_free_bytes(0),
+    MallocManager() : head_map(nullptr), tail_map(nullptr), _num_free_blocks(0), _num_free_bytes(0),
                       _num_allocated_blocks(0), _num_allocated_bytes(0), _num_meta_data_bytes(0)
     {
         for (int i = 0; i < MAX_ORDER + 1; i++)
@@ -63,10 +66,12 @@ private:
     static MallocMetadata &instance;
 
 public:
-    // MallocMetadata *head;
-    // MallocMetadata *tail;
+    MallocMetadata *head_map;
+    MallocMetadata *tail_map;
 
     MallocMetadata *free_list[MAX_ORDER + 1];
+
+
 
     size_t _num_free_blocks;
     size_t _num_free_bytes;
@@ -94,7 +99,12 @@ void *smalloc(size_t size)
     int order = getOrder(size);
     if (order > MAX_ORDER) // size is too big so need mmap()
     {
-        return nullptr;
+        MallocMetadata *block = mmap(nullptr, size + _size_meta_data(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        MallocMetadata temp = {size, false, manager.head_map, nullptr};
+        *block = temp;
+        manager.head_map = block;
+        return (void *)((char *)block + _size_meta_data());
+
     }
     // return a block from the free list
     MallocMetadata *block = getBlockByOrder(manager.free_list, order);
@@ -221,6 +231,11 @@ void *scalloc(size_t num, size_t size)
 void sfree(void *p)
 {
     MallocMetadata* block = (MallocMetadata *)((char *)p - _size_meta_data());
+    //delete the block from the heap and from the list inside manager
+    if (block->size > INITIAL_BLOCK_SIZE)
+    {
+        
+    }
     //check if nightbor is free with xor and merge
     MallocMetadata *buddy = (MallocMetadata *)((unsigned long)block ^ ((MallocMetadata *)block)->size);
     if (buddy->is_free)
