@@ -185,8 +185,10 @@ MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
     tasteCookie(bigger_block);
     // split the block into 2 insert them to the small order list delete the bigger block from the bigger order list and return the first block
     MallocMetadata *first_block = bigger_block;
-    MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + (INITIAL_BLOCK_SIZE * powerOfBase(order)));
-    first_block->size = second_block->size = INITIAL_BLOCK_SIZE * powerOfBase(order);
+    std::cout << "first block: " << first_block << std::endl;
+    MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + bigger_block->size / BASE);
+    // MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + (INITIAL_BLOCK_SIZE * powerOfBase(order)));
+    first_block->size = second_block->size = bigger_block->size / BASE;
     first_block->is_free = false;
     second_block->is_free = true;
     second_block->prev = second_block->next = nullptr;
