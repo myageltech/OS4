@@ -40,18 +40,10 @@ typedef struct MallocMetadata
     MallocMetadata *prev;
 } MallocMetadata;
 
-void tasteCookie(MallocMetadata *block)
-{
-    if (block->cookies != MallocManager::getInstance().major_cookie)
-    {
-        exit(0xdeadbeef);
-    }
-}
-
 class MallocManager
 {
 private:
-    MallocManager() : head_map(nullptr), /*tail_map(nullptr),*/ _num_free_blocks(0), _num_free_bytes(0),
+    MallocManager() : major_cookie(0), (nullptr), /*tail_map(nullptr),*/ _num_free_blocks(0), _num_free_bytes(0),
                       _num_allocated_blocks(0), _num_allocated_bytes(0), _num_meta_data_bytes(0)
     {
         major_cookie = rand();
@@ -85,7 +77,7 @@ private:
     static MallocMetadata &instance;
 
 public:
-    const int major_cookie;
+    int major_cookie;
     MallocMetadata *head_map;
     // MallocMetadata *tail_map;
 
@@ -106,6 +98,14 @@ public:
     }
     ~MallocManager() = default;
 };
+
+void tasteCookie(MallocMetadata *block)
+{
+    if (block->cookies != MallocManager::getInstance().major_cookie)
+    {
+        exit(0xdeadbeef);
+    }
+}
 
 void *smalloc(size_t size)
 {
