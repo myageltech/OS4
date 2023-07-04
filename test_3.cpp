@@ -1,5 +1,4 @@
 #include <iostream>
-#include "malloc_3.cpp"
 
 int main(int argc, char const *argv[])
 {
