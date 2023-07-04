@@ -43,6 +43,7 @@ private:
         // free_list[MAX_ORDER] += (char *)extra_room;
         // shift free_list[MAX_ORDER] to the right by extra_room
         free_list[MAX_ORDER] = (MallocMetadata *)((char *)free_list[MAX_ORDER] + extra_room);
+        last_block = (unsigned long)free_list[MAX_ORDER] + INITIAL_BLOCK_SIZE * INITIAL_BLOCKS;
         MallocMetadata *new_block = free_list[MAX_ORDER];
         for (int i = 0; i < INITIAL_BLOCKS; i++)
         {
@@ -64,6 +65,7 @@ private:
 
 public:
     int major_cookie;
+    unsigned long last_block;
     MallocMetadata *head_map;
     // MallocMetadata *tail_map;
 
@@ -227,11 +229,11 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
     tasteCookie(block);
     MallocManager &manager = MallocManager::getInstance();
     int order = getOrder(block->size);
-    if (order == MAX_ORDER)
+    MallocMetadata *buddy = (MallocMetadata *)((unsigned long)block ^ ((MallocMetadata *)block)->size);
+    if (order == MAX_ORDER || buddy > (MallocMetadata *)manager.last_block)
     {
         return block;
     }
-    MallocMetadata *buddy = (MallocMetadata *)((unsigned long)block ^ ((MallocMetadata *)block)->size);
     tasteCookie(buddy);
     if (buddy->is_free)
     {
