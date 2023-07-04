@@ -1,3 +1,6 @@
+#ifndef MALLOC_3
+#define MALLOC_3
+
 #include <unistd.h>
 #include <cstring>
 #include <sys/mman.h>
@@ -397,3 +400,5 @@ int powerOfBase(int power)
     }
     return res;
 }
+
+#endif
