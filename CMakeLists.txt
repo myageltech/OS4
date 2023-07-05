@@ -1,7 +1,16 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.25)
 
-project(os-hw3)
+project(OS4_3)
 
-set(SOURCE_DIR ${CMAKE_SOURCE_DIR})
+set(CMAKE_CXX_STANDARD 11)
 
-add_subdirectory(tests)
+set (PROJECT_HEADERS
+    my_stdlib.h
+)
+
+set (PROJECT_SOURCES
+    test_3.cpp
+    malloc_3.cpp 
+)
+
+add_subdirectory(OS4_3 ${PROJECT_HEADERS} ${PROJECT_SOURCES} )
