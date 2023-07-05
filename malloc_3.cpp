@@ -27,7 +27,6 @@ typedef struct MallocMetadata
 class MallocManager
 {
 private:
-
     MallocManager() : major_cookie(0), head_map(nullptr), /*tail_map(nullptr),*/ _num_free_blocks(0), _num_free_bytes(0),
                       _num_allocated_blocks(0), _num_allocated_bytes(0), _num_meta_data_bytes(0)
     {
@@ -59,7 +58,7 @@ private:
         _num_allocated_bytes = INITIAL_BLOCK_SIZE * INITIAL_BLOCKS;
         _num_meta_data_bytes = INITIAL_BLOCKS * _size_meta_data();
     }
-    
+
     // static MallocManager &instance;
 
 public:
@@ -188,22 +187,23 @@ MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
     std::cout << "first block: " << first_block << std::endl;
     MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + bigger_block->size / BASE);
     // MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + (INITIAL_BLOCK_SIZE * powerOfBase(order)));
+    second_block->cookies = first_block->cookies;
     first_block->size = second_block->size = bigger_block->size / BASE;
     first_block->is_free = false;
     second_block->is_free = true;
     second_block->prev = second_block->next = nullptr;
     first_block->prev = first_block->next = nullptr;
     blocks_list[order] = second_block;
+    MallocManagrer &manager = MallocManager::getInstance();
+    manager._num_free_blocks++;
+    manager._num_allocated_blocks++;
+    manager._meta_data_bytes += _size_meta_data();
     return first_block;
 }
 
 void removeBlockFromFreeList(MallocMetadata *block)
 {
     MallocManager &manager = MallocManager::getInstance();
-    if (block->cookies != manager.major_cookie)
-    {
-        exit(0xdeadbeef);
-    }
     int order = getOrder(block->size);
     if (block->prev == nullptr)
     {
@@ -229,21 +229,8 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
     int order = getOrder(block->size);
     if (order == MAX_ORDER)
     {
-        return block;
-    }
-    MallocMetadata *buddy = (MallocMetadata *)((unsigned long)block ^ ((MallocMetadata *)block)->size);
-    tasteCookie(buddy);
-    if (buddy->is_free)
-    {
-        // merge
-        // if buddy is head
-        removeBlockFromFreeList(buddy);
-        // remove buddy from free list
-        block->size *= BASE;
-        return addBlockToFreeList((MallocMetadata *)block);
-    }
-    else
-    {
+        manager._num_free_blocks++;
+        manager._num_free_bytes += block->size;
         // add block to free list
         if (manager.free_list[order] == nullptr)
         {
@@ -259,8 +246,39 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
             manager.free_list[order]->prev = block;
             manager.free_list[order] = block;
         }
+        return block;
+    }
+    MallocMetadata *buddy = (MallocMetadata *)((unsigned long)block ^ ((MallocMetadata *)block)->size);
+    tasteCookie(buddy);
+    if (buddy->is_free)
+    {
+        // merge
+        // if buddy is head
+        removeBlockFromFreeList(buddy);
+        // remove buddy from free list
+        block->size *= BASE;
+        manager._num_meta_data_bytes -= _size_meta_data();
+        return addBlockToFreeList((MallocMetadata *)block);
+    }
+    else
+    {
         manager._num_free_blocks++;
         manager._num_free_bytes += block->size;
+        // add block to free list
+        if (manager.free_list[order] == nullptr)
+        {
+            manager.free_list[order] = block;
+            block->next = nullptr;
+            block->prev = nullptr;
+        }
+        else
+        {
+            block->next = manager.free_list[order];
+            tasteCookie(block->next);
+            block->prev = nullptr;
+            manager.free_list[order]->prev = block;
+            manager.free_list[order] = block;
+        }
         return block;
     }
 }
@@ -273,6 +291,7 @@ void mergeBudies(MallocMetadata *old_block, int num_of_iterations)
     {
         tasteCookie(buddy);
         removeBlockFromFreeList(buddy);
+        MallocManager::getInstance()._num_meta_data_bytes -= _size_meta_data();
         old_block->size *= BASE;
         buddy = (MallocMetadata *)((unsigned long)old_block ^ ((MallocMetadata *)old_block)->size);
     }
@@ -314,11 +333,22 @@ void *smalloc(size_t size)
         MallocMetadata temp = {MallocManager::getInstance().major_cookie, (unsigned long)size, false, manager.head_map, nullptr};
         *block = temp;
         manager.head_map = block;
+        manager._num_allocated_blocks++;
+        manager._num_allocated_bytes += size;
+        manager._num_meta_data_bytes += _size_meta_data();
         return (void *)((char *)block + _size_meta_data());
     }
     std::cout << "found that the size is less then 128 KB" << std::endl;
     // return a block from the free list
+    if (!manager.free_list[order])
+    {
+        manager._num_free_bytes -= BASE_BLOCK_SIZE * powerOfBase(order);
+    }
     MallocMetadata *block = getBlockByOrder(manager.free_list, order);
+    if (!block)
+    {
+        manager._num_free_bytes += BASE_BLOCK_SIZE * powerOfBase(order);
+    }
     std::cout << "after get block by order" << std::endl;
     if (block == nullptr)
     {
@@ -349,9 +379,13 @@ void sfree(void *p)
 {
     MallocMetadata *block = (MallocMetadata *)((char *)p - _size_meta_data());
     tasteCookie(block);
+    MallocManager &manager = MallocManager::getInstance();
     // delete the block from the heap and from the list inside manager
     if (block->size > INITIAL_BLOCK_SIZE)
     {
+        manager._num_allocated_bytes -= block->size;
+        manager._num_allocated_blocks--;
+        manager._num_meta_data_bytes -= _size_meta_data();
         // remove block from linked list
         if (block->prev == nullptr)
         {
@@ -368,7 +402,9 @@ void sfree(void *p)
             block->next->prev = block->prev;
         }
         munmap(block, block->size + _size_meta_data());
+        return;
     }
+    MallocManager::getInstance()._num_free_bytes += block->size;
     addBlockToFreeList(block);
 }
 
