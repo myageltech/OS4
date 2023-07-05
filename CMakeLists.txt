@@ -13,4 +13,4 @@ set (PROJECT_SOURCES
     malloc_3.cpp 
 )
 
-add_subdirectory(OS4_3 ${PROJECT_HEADERS} ${PROJECT_SOURCES} )
+add_executable(OS4_3 ${PROJECT_HEADERS} ${PROJECT_SOURCES} )
