@@ -194,10 +194,10 @@ MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
     second_block->prev = second_block->next = nullptr;
     first_block->prev = first_block->next = nullptr;
     blocks_list[order] = second_block;
-    MallocManagrer &manager = MallocManager::getInstance();
+    MallocManager &manager = MallocManager::getInstance();
     manager._num_free_blocks++;
     manager._num_allocated_blocks++;
-    manager._meta_data_bytes += _size_meta_data();
+    manager._num_meta_data_bytes += _size_meta_data();
     return first_block;
 }
 

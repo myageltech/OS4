@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.9)
 
 project(OS4_3)
 
@@ -13,4 +13,4 @@ set (PROJECT_SOURCES
     malloc_3.cpp 
 )
 
-add_executable(OS4_3 ${PROJECT_HEADERS} ${PROJECT_SOURCES} )
+add_executable(OS4_3 ${PROJECT_SOURCES} ${PROJECT_HEADERS})
