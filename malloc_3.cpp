@@ -208,7 +208,7 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
     }
     MallocMetadata *buddy = (MallocMetadata *)((unsigned long)block ^ ((MallocMetadata *)block)->size);
     tasteCookie(buddy);
-    if (buddy->is_free)
+    if (buddy->is_free && getOrder(buddy->size) == order) // buddy is free and same order
     {
         removeBlockFromFreeList(buddy);
         block->size *= BASE;
