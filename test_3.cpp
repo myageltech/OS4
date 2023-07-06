@@ -200,11 +200,11 @@ void test2malloc1afteranother(){
     int *q = (int *)smalloc(sizeof(int));
     *q = 10;
     std::cout << "2 smalloc " << (q == NULL ? "fail" : "success!") << std::endl;
-    check_num_allocated_blocks(43);
+    check_num_allocated_blocks(42);
     check_num_allocated_bytes(128 * 1024 * 32);
     check_num_free_blocks(40);
     check_num_free_bytes((128 * 1024 * 32) - 256);
-    check_num_meta_data_bytes(40 * 43);
+    check_num_meta_data_bytes(40 * 42);
 }
 
 void test2malloc1afteranotherwithfree() {
