@@ -6,6 +6,46 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+void check_num_allocated_blocks(int expected){
+    std::cout << "check_num_allocated_blocks" << (_num_allocated_blocks() == expected ? " success!" : "Fail!") << std::endl;
+    if (_num_allocated_blocks() != expected) {
+    std::cout << "Number of allocated blocks is: " << _num_allocated_blocks() << " but should be" << expected << std::endl;
+    exit(2);
+    }
+}
+
+void check_num_allocated_bytes(int expected){
+    std::cout << "check_num_allocated_bytes" << (_num_allocated_bytes() == expected ? " success!" : "Fail!") << std::endl;
+    if (_num_allocated_bytes() != expected) {
+    std::cout << "Number of allocated blocks is: " << _num_allocated_bytes() << " but should be" << expected << std::endl;
+    exit(2);
+    }
+}
+
+void check_num_free_blocks(int expected){
+    std::cout << "check_num_free_blocks" << (_num_free_blocks() == expected ? " success!" : "Fail!") << std::endl;
+    if (_num_free_blocks() != expected) {
+    std::cout << "Number of allocated blocks is: " << _num_free_blocks() << " but should be" << expected << std::endl;
+    exit(2);
+    }
+}
+
+void check_num_free_bytes(int expected){
+    std::cout << "check_num_free_bytes" << (_num_free_bytes() == expected ? " success!" : "Fail!") << std::endl;
+    if (_num_free_bytes() != expected) {
+    std::cout << "Number of allocated blocks is: " << _num_free_bytes() << " but should be" << expected << std::endl;
+    exit(2);
+    }
+}
+
+void check_num_meta_data_bytes(int expected){
+    std::cout << "check_num_meta_data_bytes" << (_num_meta_data_bytes() == expected ? " success!" : "Fail!") << std::endl;
+    if (_num_meta_data_bytes() != expected) {
+    std::cout << "Number of allocated blocks is: " << _num_meta_data_bytes() << " but should be" << expected << std::endl;
+    exit(2);
+    }
+}
+
 int main(int argc, char const *argv[])
 {
 
@@ -14,48 +54,26 @@ int main(int argc, char const *argv[])
     int *p = (int *)smalloc(sizeof(int));
     *p = 10;
     std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
-    int numFreeBlocks = _num_free_blocks();
-    std::cout << "num_free_block" << (numFreeBlocks == 41 ? " success!" : "Fail!") << std::endl;
-    if (numFreeBlocks != 41) {
-    std::cout << "Number of free blocks is: " << numFreeBlocks << " but should be 41" << std::endl;
-    exit(2);
-    }
+
+    check_num_allocated_blocks(41);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(41);
+    check_num_free_bytes((128 * 1024 * 32) - 128);
+    check_num_meta_data_bytes(40 * 41);
 
     // test sfree
     std::cout << "|-----------------------------------|" << std::endl << "Sfree Test" << std::endl;
     sfree(p);
-    numFreeBlocks = _num_free_blocks();
-    std::cout << "num_free_block" << (numFreeBlocks == 32 ? " success!" : "Fail!") << std::endl;
-    if (numFreeBlocks != 41) {
-    std::cout << "Number of free blocks is: " << numFreeBlocks << " but should be 41" << std::endl;
-    exit(2);
-    }
-    std::cout << "|-----------------------------------|" << std::endl;
-    std::cout << "the size should be" << sizeof(int) << std::endl;
-    std::cout << "the order should be" << 0 << std::endl;
-    std::cout << "is free shoud be" << "false" << std::endl;
     
-    // // test cookies for smalloc if they are not overwritten
-    // std::cout << "|-----------------------------------|" << std::endl;
-    // std::cout << "Smalloc Test for cookies" << std::endl;
-    // int *a = (int *)smalloc(sizeof(int));
-    // if (a == NULL)
-    // {
-    //     std::cout << "Smalloc Test Failed!" << std::endl;
-    //     std::cout << "Got NULL" << std::endl;
-    // }
-    // else if (*a != 0xAAAAAAAA)
-    // {
-    //     std::cout << "Smalloc Test Failed!" << std::endl;
-    //     std::cout << "Expected: 0xAAAAAAAA" << std::endl;
-    //     std::cout << "Got: " << *a << std::endl;
-    // }
-    // else{
-    // std::cout << "Smalloc Test Passed!" << std::endl;
-    // }
+    check_num_allocated_blocks(41);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(41);
+    check_num_free_bytes((128 * 1024 * 32) - 128);
+    check_num_meta_data_bytes(40 * 32);
+
     std::cout << "|-----------------------------------|" << std::endl;
     // test scalloc
-    std::cout << "|-----------------------------------|" << std::endl;
+    std::cout << std::endl << "|-----------------------------------|" << std::endl;
     std::cout << "Scalloc Test" << std::endl;
     int *q = (int *)scalloc(5, sizeof(int));
     if (q == NULL)
