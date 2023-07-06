@@ -161,3 +161,5 @@ size_t _size_meta_data()
 {
     return sizeof(MallocMetadata);
 }
+
+// Path: malloc_2.cpp

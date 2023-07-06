@@ -152,58 +152,9 @@ int getOrder(size_t size)
     return order;
 }
 
-/*If we reuse freed memory sectors with bigger sizes than required, we’ll be wasting memory
-(internal fragmentation).
-Solution: Implement a function that smalloc() will use, such that if a pre-allocated block
-is reused and is large enough, the function will cut the block in half to two blocks (buddies)
-with two separate meta-data structs. One will serve the current allocation, and the other will
-remain unused for later (marked free and added to the free blocks data structure). This
-process should be done iteratively until the allocated block is no longer “large enough”.
-Definition of “large enough”: The allocated block is large enough if it is of order > 0, and if
-after splitting it to two equal sized blocks, the requested user allocation is small enough to
-fit entirely inside the first block, so the second block will be free.
-*/
-MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
-{
-    if (blocks_list[order] != nullptr)
-    {
-        MallocMetadata *temp = blocks_list[order];
-        blocks_list[order] = blocks_list[order]->next;
-        temp->next = temp->prev = nullptr;
-        temp->is_free = false;
-        return temp;
-    }
-    if (order == MAX_ORDER)
-    {
-        return nullptr;
-    }
-    MallocMetadata *bigger_block = getBlockByOrder(blocks_list, order + 1);
-    if (bigger_block == nullptr)
-    {
-        return nullptr;
-    }
-    tasteCookie(bigger_block);
-    // split the block into 2 insert them to the small order list delete the bigger block from the bigger order list and return the first block
-    MallocMetadata *first_block = bigger_block;
-    // std::cout << "first block: " << first_block << std::endl;
-    MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + bigger_block->size / BASE);
-    // MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + (INITIAL_BLOCK_SIZE * powerOfBase(order)));
-    second_block->cookies = first_block->cookies;
-    first_block->size = second_block->size = bigger_block->size / BASE;
-    first_block->is_free = false;
-    second_block->is_free = true;
-    second_block->prev = second_block->next = nullptr;
-    first_block->prev = first_block->next = nullptr;
-    blocks_list[order] = second_block;
-    MallocManager &manager = MallocManager::getInstance();
-    manager._num_free_blocks++;
-    manager._num_allocated_blocks++;
-    manager._num_meta_data_bytes += _size_meta_data();
-    return first_block;
-}
-
 void removeBlockFromFreeList(MallocMetadata *block)
 {
+    tasteCookie(block);
     MallocManager &manager = MallocManager::getInstance();
     int order = getOrder(block->size);
     if (block->prev == nullptr)
@@ -219,8 +170,53 @@ void removeBlockFromFreeList(MallocMetadata *block)
         block->next->prev = block->prev;
     }
     manager._num_free_blocks--;
-    manager._num_free_bytes -= block->size;
+    block->next = block->prev = nullptr;
+    block->is_free = false;
     std::cout << "removeBlockFromFreeList: num free blocks:" << manager._num_free_blocks << std::endl;
+}
+
+/*If we reuse freed memory sectors with bigger sizes than required, we’ll be wasting memory
+(internal fragmentation).
+Solution: Implement a function that smalloc() will use, such that if a pre-allocated block
+is reused and is large enough, the function will cut the block in half to two blocks (buddies)
+with two separate meta-data structs. One will serve the current allocation, and the other will
+remain unused for later (marked free and added to the free blocks data structure). This
+process should be done iteratively until the allocated block is no longer “large enough”.
+Definition of “large enough”: The allocated block is large enough if it is of order > 0, and if
+after splitting it to two equal sized blocks, the requested user allocation is small enough to
+fit entirely inside the first block, so the second block will be free.
+*/
+MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
+{
+    MallocManager &manager = MallocManager::getInstance();
+    if (blocks_list[order] != nullptr)
+    {
+        MallocMetadata *temp = blocks_list[order];
+        removeBlockFromFreeList(temp);
+        return temp;
+    }
+    if (order == MAX_ORDER)
+    {
+        return nullptr;
+    }
+    MallocMetadata *bigger_block = getBlockByOrder(blocks_list, order + 1);
+    if (bigger_block == nullptr)
+    {
+        return nullptr;
+    }
+    MallocMetadata *first_block = bigger_block;
+    MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + bigger_block->size / BASE);
+    second_block->cookies = first_block->cookies;
+    first_block->size = second_block->size = bigger_block->size / BASE;
+    first_block->is_free = false;
+    second_block->is_free = true;
+    second_block->prev = second_block->next = nullptr;
+    first_block->prev = first_block->next = nullptr;
+    blocks_list[order] = second_block;
+    manager._num_free_blocks++;
+    manager._num_allocated_blocks++;
+    manager._num_meta_data_bytes += _size_meta_data();
+    return first_block;
 }
 
 // join 2 blocks to one block and add them to the free list and use addBlockToFreeList recursively
@@ -232,7 +228,6 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
     if (order == MAX_ORDER)
     {
         manager._num_free_blocks++;
-        manager._num_free_bytes += block->size;
         std::cout << "addBlockToFreeList MAX_ORDER: num free blocks:" << manager._num_free_blocks << std::endl;
         // add block to free list
         if (manager.free_list[order] == nullptr)
@@ -348,10 +343,6 @@ void *smalloc(size_t size)
         manager._num_free_bytes -= BASE_BLOCK_SIZE * powerOfBase(order);
     }
     MallocMetadata *block = getBlockByOrder(manager.free_list, order);
-    if (!block)
-    {
-        manager._num_free_bytes += BASE_BLOCK_SIZE * powerOfBase(order);
-    }
     // std::cout << "after get block by order" << std::endl;
     if (block == nullptr)
     {
@@ -382,8 +373,8 @@ void *scalloc(size_t num, size_t size)
 void sfree(void *p)
 {
     // MallocMetadata *block = (MallocMetadata *)((char *)p - _size_meta_data());
-    MallocMetadata *block = (MallocMetadata *)(p);
-    block = block - 1;
+    MallocMetadata *block = ((MallocMetadata *)(p)) - 1;
+    // block = block - 1;
     tasteCookie(block);
     MallocManager &manager = MallocManager::getInstance();
     // delete the block from the heap and from the list inside manager
