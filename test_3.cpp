@@ -275,7 +275,7 @@ void test2malloc1afteranotherwithfreeandreallocandcalloc(){
     check_num_allocated_bytes(128 * 1024 * 32);
     check_num_free_blocks(38);
     check_num_free_bytes((128 * 1024 * 32) - 384);
-    check_num_meta_data_bytes(40 * 40);
+    check_num_meta_data_bytes(40 * 41);
 }
 
 void testsmalloc(){
