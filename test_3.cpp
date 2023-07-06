@@ -247,33 +247,95 @@ void testsmalloc(){
     sfree(p);
 }
 
+void smallochigherthen128KB(){
+    int *p = (int *)smalloc(128 * 1024 + 1);
+    std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
+    check_num_allocated_blocks(33);
+    check_num_allocated_bytes(128 * 1024 * 32 + 128 * 1024 + 1 + 40);
+    check_num_free_blocks(32);
+    check_num_free_bytes((128 * 1024 * 32));
+    check_num_meta_data_bytes(40 * 33);
+    sfree(p);
+    check_num_allocated_blocks(32);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(32);
+    check_num_free_bytes((128 * 1024 * 32));
+    check_num_meta_data_bytes(40 * 32);
+}
+
+void scallochigherthen128KB(){
+    int *p = (int *)scalloc(2, 128 * 1024);
+    std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
+    check_num_allocated_blocks(33);
+    check_num_allocated_bytes(128 * 1024 * 32 + 128 * 1024 + 1 + 40);
+    check_num_free_blocks(32);
+    check_num_free_bytes((128 * 1024 * 32));
+    check_num_meta_data_bytes(40 * 33);
+    sfree(p);
+    check_num_allocated_blocks(32);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(32);
+    check_num_free_bytes((128 * 1024 * 32));
+    check_num_meta_data_bytes(40 * 32);
+}
+
+void reallochigherthen128KB(){
+    int *p = (int *)smalloc(128 * 1024);
+    std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
+    int *q = (int *)srealloc(p, 128 * 1024 + 1);
+    std::cout << "1 srealloc " << (q == NULL ? "fail" : "success!") << std::endl;
+    check_num_allocated_blocks(33);
+    check_num_allocated_bytes(128 * 1024 * 32 + 128 * 1024 + 1 + 40);
+    check_num_free_blocks(32);
+    check_num_free_bytes((128 * 1024 * 32));
+    check_num_meta_data_bytes(40 * 33);
+    sfree(q);
+    check_num_allocated_blocks(32);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(32);
+    check_num_free_bytes((128 * 1024 * 32));
+    check_num_meta_data_bytes(40 * 32);
+}
+
+void sfreehigherthen128KB(){
+    int *p = (int *)smalloc(128 * 1024+1);
+    std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
+    sfree(p);
+    check_num_allocated_blocks(32);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(32);
+    check_num_free_bytes((128 * 1024 * 32));
+    check_num_meta_data_bytes(40 * 32);
+}
+
 int main(int argc, char const *argv[])
 {
     std::cout << "|-----------------------------------|" << std::endl;
-    std::cout << "surroundingTest Tests" << std::endl;
-    surroundingTest();
-    std::cout << "test_3" << std::endl;
+    std::cout << "smalloc higherthen128KB Tests" << std::endl;
     std::cout << "|-----------------------------------|" << std::endl;
-    std::cout << "smalloc Test" << std::endl;
-    testsmalloc();
+    smallochigherthen128KB();
+
     std::cout << "|-----------------------------------|" << std::endl;
-    std::cout<< std::endl  << "2 malloc 1 after another" << std::endl;
-    test2malloc1afteranother();
-    std::cout << std::endl << "|-----------------------------------|" << std::endl;
-    std::cout << "2 malloc 1 after another with free" << std::endl;
-    test2malloc1afteranotherwithfree();
-    std::cout << std::endl << "|-----------------------------------|" << std::endl;
-    std::cout << "2 malloc 1 after another with free and realloc" << std::endl;
-    test2malloc1afteranotherwithfreeandrealloc();
-    std::cout << std::endl << "|-----------------------------------|" << std::endl;
-    std::cout << "2 malloc 1 after another with free and realloc and calloc" << std::endl;
-    test2malloc1afteranotherwithfreeandreallocandcalloc();
-    std::cout << std::endl << "|-----------------------------------|" << std::endl;
+    std::cout << "scallochigherthen128KB higherthen128KB Tests" << std::endl;
+    std::cout << "|-----------------------------------|" << std::endl;
+    scallochigherthen128KB();
+
+    std::cout << "|-----------------------------------|" << std::endl;
+    std::cout << "reallochigherthen128KB higherthen128KB Tests" << std::endl;
+    std::cout << "|-----------------------------------|" << std::endl;
+    reallochigherthen128KB();
+
+    std::cout << "|-----------------------------------|" << std::endl;
+    std::cout << "sfreehigherthen128KB higherthen128KB Tests" << std::endl;
+    std::cout << "|-----------------------------------|" << std::endl;
+
+    sfreehigherthen128KB();
+
     std::cout << "*******************************************" << std::endl;
-        std::cout << "*******************************************" << std::endl;
+    std::cout << "*******************************************" << std::endl;
 
     std::cout << "so long bitches!!!!! passed all malloc_3" << std::endl;
-        std::cout << "*******************************************" << std::endl;
-        std::cout << "*******************************************" << std::endl;
+    std::cout << "*******************************************" << std::endl;
+    std::cout << "*******************************************" << std::endl;
     return 0;
 }
