@@ -347,12 +347,13 @@ void *scalloc(size_t num, size_t size)
 
 void sfree(void *p)
 {
-    // MallocMetadata *block = (MallocMetadata *)((char *)p - _size_meta_data());
-    MallocMetadata *block = ((MallocMetadata *)(p)) - 1;
-    // block = block - 1;
+    if (!p)
+    {
+        return;
+    }
+    MallocMetadata *block = (MallocMetadata *)p - 1;
     tasteCookie(block);
     MallocManager &manager = MallocManager::getInstance();
-    // delete the block from the heap and from the list inside manager
     if (block->size > INITIAL_BLOCK_SIZE)
     {
         manager._num_allocated_bytes -= block->size;
