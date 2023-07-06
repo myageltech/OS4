@@ -313,13 +313,15 @@ void *smalloc(size_t size)
     if (order > MAX_ORDER) // size is too big so need mmap()
     {
         MallocMetadata *block = (MallocMetadata *)mmap(nullptr, size + _size_meta_data(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-        MallocMetadata temp = {MallocManager::getInstance().major_cookie, (unsigned long)size, false, manager.head_map, nullptr};
+        MallocMetadata temp = {MallocManager::getInstance().major_cookie,
+                               (unsigned long)size + _size_meta_data(), false,
+                               manager.head_map, nullptr};
         *block = temp;
         manager.head_map = block;
         manager._num_allocated_blocks++;
-        manager._num_allocated_bytes += size;
+        manager._num_allocated_bytes += size + _size_meta_data();
         manager._num_meta_data_bytes += _size_meta_data();
-        return (void *)((char *)block + _size_meta_data());
+        return (void *)(block + 1);
     }
     MallocMetadata *block = getBlockByOrder(manager.free_list, order);
     if (block == nullptr)
@@ -374,7 +376,7 @@ void sfree(void *p)
             tasteCookie(block->next);
             block->next->prev = block->prev;
         }
-        munmap(block, block->size + _size_meta_data());
+        munmap(block, block->size);
         return;
     }
     MallocManager::getInstance()._num_free_bytes += block->size;
