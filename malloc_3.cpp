@@ -141,7 +141,7 @@ int getOrder(size_t size)
 {
     // std::cout << "get order: " << size << std::endl;
     int order = MIN_ORDER;
-    while (size + _size_meta_data() > BASE_BLOCK_SIZE * powerOfBase(order))
+    while (size > BASE_BLOCK_SIZE * powerOfBase(order))
     {
         // std::cout << "get order: " << size << std::endl;
         // std::cout << "get order: " << BASE_BLOCK_SIZE * powerOfBase(order) << std::endl;
@@ -306,7 +306,7 @@ void *smalloc(size_t size)
     }
     MallocManager &manager = MallocManager::getInstance();
     std::cout << "smalloc: num free blocks:" << manager._num_free_blocks << std::endl;
-    int order = getOrder(size);
+    int order = getOrder(size + _size_meta_data());
     if (order > MAX_ORDER) // size is too big so need mmap()
     {
         MallocMetadata *block = (MallocMetadata *)mmap(nullptr, size + _size_meta_data(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -394,7 +394,7 @@ void *srealloc(void *oldp, size_t size)
     // int iterations = (size + _size_meta_data()) / old_block->size - ((size + _size_meta_data())%old_block->size == 0);
     if (old_block->size <= INITIAL_BLOCK_SIZE && buddiesMergeCounter(old_block, size) + getOrder(old_block->size) > getOrder(size))
     {
-        mergeBudies(old_block, getOrder(size) - getOrder(old_block->size));
+        mergeBudies(old_block, getOrder(size + _size_meta_data()) - getOrder(old_block->size));
         return oldp;
     }
     else
