@@ -205,6 +205,8 @@ void test2malloc1afteranother(){
     check_num_free_blocks(40);
     check_num_free_bytes((128 * 1024 * 32) - 256);
     check_num_meta_data_bytes(40 * 42);
+    sfree(p);
+    sfree(q);
 }
 
 void test2malloc1afteranotherwithfree() {
@@ -221,7 +223,6 @@ void test2malloc1afteranotherwithfree() {
     check_num_free_bytes((128 * 1024 * 32) - 128);
     check_num_meta_data_bytes(40 * 41);
     sfree(q);
-    sfree(p);
 }
 
 void test2malloc1afteranotherwithfreeandrealloc() {
