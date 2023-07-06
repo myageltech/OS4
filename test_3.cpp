@@ -220,6 +220,8 @@ void test2malloc1afteranotherwithfree() {
     check_num_free_blocks(41);
     check_num_free_bytes((128 * 1024 * 32) - 128);
     check_num_meta_data_bytes(40 * 41);
+    sfree(q);
+    sfree(p);
 }
 
 void test2malloc1afteranotherwithfreeandrealloc() {
@@ -238,6 +240,8 @@ void test2malloc1afteranotherwithfreeandrealloc() {
     check_num_free_blocks(39);
     check_num_free_bytes((128 * 1024 * 32) - 384);
     check_num_meta_data_bytes(40 * 40);
+    sfree(r);
+
 }
 
 void test2malloc1afteranotherwithfreeandreallocandcalloc(){
@@ -276,6 +280,9 @@ void test2malloc1afteranotherwithfreeandreallocandcalloc(){
     check_num_free_blocks(38);
     check_num_free_bytes((128 * 1024 * 32) - 384);
     check_num_meta_data_bytes(40 * 41);
+    sfree(r);
+    sfree(s);
+
 }
 
 void testsmalloc(){
@@ -287,6 +294,7 @@ void testsmalloc(){
     check_num_free_blocks(41);
     check_num_free_bytes((128 * 1024 * 32) - 128);
     check_num_meta_data_bytes(40 * 42);
+    sfree(p);
 }
 
 int main(int argc, char const *argv[])
