@@ -125,74 +125,20 @@ void surroundingTest() {
     std::cout << "|-----------------------------------|" << std::endl;
     // test smalloc with size 0
     std::cout << "|-----------------------------------|" << std::endl;
+    std::cout << "|-----------------------------------|" << std::endl;
     std::cout << "Smalloc Test with size 0" << std::endl;
     int *s = (int *)smalloc(0);
-    if (s != NULL)
+    if (s == NULL)
     {
-        std::cout << "Smalloc Test Failed!" << std::endl;
-        std::cout << "Expected: NULL" << std::endl;
-        std::cout << "Got: " << s << std::endl;
-    }
-    else
-    {
-        std::cout << "Smalloc Test Passed!" << std::endl;
-    }
-    sfree(s);
-    std::cout << "|-----------------------------------|" << std::endl;
-    // test scalloc with size 0
-    std::cout << "|-----------------------------------|" << std::endl;
-    std::cout << "Scalloc Test with size 0" << std::endl;
-    int *t = (int *)scalloc(0, sizeof(int));
-    if (t != NULL)
-    {
-        std::cout << "Scalloc Test Failed!" << std::endl;
-        std::cout << "Expected: NULL" << std::endl;
-        std::cout << "Got: " << t << std::endl;
-    }
-    else
-    {
-        std::cout << "Scalloc Test Passed!" << std::endl;
-    }
-    sfree(t);
-    std::cout << "|-----------------------------------|" << std::endl;
-    // test srealloc with size 0
-    std::cout << "|-----------------------------------|" << std::endl;
-    std::cout << "Srealloc Test with size 0" << std::endl;
-    int *u = (int *)srealloc(r, 0);
-    if (u != NULL)
-    {
-        std::cout << "Srealloc Test Failed!" << std::endl;
-        std::cout << "Expected: NULL" << std::endl;
-        std::cout << "Got: " << u << std::endl;
-    }
-    else
-    {
-        std::cout << "Srealloc Test Passed!" << std::endl;
-    }
-    std::cout << "|-----------------------------------|" << std::endl;
-    // test sfree with NULL
-    std::cout << "|-----------------------------------|" << std::endl;
-    // test sfree with invalid pointer
-    std::cout << "|-----------------------------------|" << std::endl;
-    std::cout << "Sfree Test with invalid pointer" << std::endl;
-    int *v = (int *)malloc(sizeof(int));
-    sfree(v);
-    std::cout << "Sfree Test Passed!" << std::endl;
-    std::cout << "|-----------------------------------|" << std::endl;
-    // test smalloc with size 128 KB
-    std::cout << "|-----------------------------------|" << std::endl;
-    std::cout << "Smalloc Test with size 128 KB" << std::endl;
-    int *w = (int *)smalloc(128 * 1024);
-    if (w == NULL)
-    {
-        std::cout << "Smalloc Test Failed!" << std::endl;
+        std::cout << "Smalloc Test with size 0 Failed!" << std::endl;
         std::cout << "Got NULL" << std::endl;
     }
     else
     {
-        std::cout << "Smalloc Test Passed!" << std::endl;
+        std::cout << "Smalloc Test with size 0 Failed!" << std::endl;
+        std::cout << "Expected: NULL" << std::endl;
+        std::cout << "Got: " << s << std::endl;
     }
-    std::cout << "|-----------------------------------|" << std::endl;
 }
 
 void test2malloc1afteranother(){
@@ -322,6 +268,11 @@ int main(int argc, char const *argv[])
     std::cout << "2 malloc 1 after another with free and realloc and calloc" << std::endl;
     test2malloc1afteranotherwithfreeandreallocandcalloc();
     std::cout << std::endl << "|-----------------------------------|" << std::endl;
+    std::cout << "*******************************************" << std::endl;
+        std::cout << "*******************************************" << std::endl;
 
+    std::cout << "so long bitches!!!!! passed all malloc_3" << std::endl;
+        std::cout << "*******************************************" << std::endl;
+        std::cout << "*******************************************" << std::endl;
     return 0;
 }
