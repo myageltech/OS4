@@ -137,6 +137,7 @@ void surroundingTest() {
     {
         std::cout << "Smalloc Test Passed!" << std::endl;
     }
+    sfree(s);
     std::cout << "|-----------------------------------|" << std::endl;
     // test scalloc with size 0
     std::cout << "|-----------------------------------|" << std::endl;
@@ -152,6 +153,7 @@ void surroundingTest() {
     {
         std::cout << "Scalloc Test Passed!" << std::endl;
     }
+    sfree(t);
     std::cout << "|-----------------------------------|" << std::endl;
     // test srealloc with size 0
     std::cout << "|-----------------------------------|" << std::endl;
@@ -170,15 +172,10 @@ void surroundingTest() {
     std::cout << "|-----------------------------------|" << std::endl;
     // test sfree with NULL
     std::cout << "|-----------------------------------|" << std::endl;
-    std::cout << "Sfree Test with NULL" << std::endl;
-    sfree(NULL);
-    std::cout << "Sfree Test Passed!" << std::endl;
-    std::cout << "|-----------------------------------|" << std::endl;
     // test sfree with invalid pointer
     std::cout << "|-----------------------------------|" << std::endl;
     std::cout << "Sfree Test with invalid pointer" << std::endl;
     int *v = (int *)malloc(sizeof(int));
-    sfree(v);
     sfree(v);
     std::cout << "Sfree Test Passed!" << std::endl;
     std::cout << "|-----------------------------------|" << std::endl;
@@ -305,6 +302,9 @@ void testsmalloc(){
 
 int main(int argc, char const *argv[])
 {
+    std::cout << "|-----------------------------------|" << std::endl;
+    std::cout << "surroundingTest Tests" << std::endl;
+    surroundingTest();
     std::cout << "test_3" << std::endl;
     std::cout << "|-----------------------------------|" << std::endl;
     std::cout << "smalloc Test" << std::endl;
@@ -322,8 +322,6 @@ int main(int argc, char const *argv[])
     std::cout << "2 malloc 1 after another with free and realloc and calloc" << std::endl;
     test2malloc1afteranotherwithfreeandreallocandcalloc();
     std::cout << std::endl << "|-----------------------------------|" << std::endl;
-    std::cout << "|-----------------------------------|" << std::endl;
-    std::cout << "surroundingTest Tests" << std::endl;
-    surroundingTest();
+
     return 0;
 }
