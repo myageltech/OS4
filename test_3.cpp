@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
                 exit(2);
 
     }
-    else if (*p != 10)
+    if (*p != 10)
     {
         std::cout << "Smalloc Test Failed!" << std::endl;
         std::cout << "Expected: 10" << std::endl;
