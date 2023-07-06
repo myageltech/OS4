@@ -46,7 +46,7 @@ void check_num_meta_data_bytes(int expected){
     }
 }
 
-void basicTests() {
+void surroundingTest() {
   // test smalloc
     std::cout << "|-----------------------------------|" << std::endl<< "Smalloc Test" << std::endl;
     int *p = (int *)smalloc(sizeof(int));
@@ -193,8 +193,108 @@ void basicTests() {
     std::cout << "|-----------------------------------|" << std::endl;
 }
 
+void test2malloc1afteranother(){
+    int *p = (int *)smalloc(sizeof(int));
+    *p = 10;
+    std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
+    int *q = (int *)smalloc(sizeof(int));
+    *q = 10;
+    std::cout << "2 smalloc " << (q == NULL ? "fail" : "success!") << std::endl;
+    check_num_allocated_blocks(42);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(40);
+    check_num_free_bytes((128 * 1024 * 32) - 256);
+    check_num_meta_data_bytes(40 * 40);
+}
+
+void test2malloc1afteranotherwithfree() {
+    int *p = (int *)smalloc(sizeof(int));
+    *p = 10;
+    std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
+    int *q = (int *)smalloc(sizeof(int));
+    *q = 10;
+    std::cout << "2 smalloc " << (q == NULL ? "fail" : "success!") << std::endl;
+    sfree(p);
+    check_num_allocated_blocks(42);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(41);
+    check_num_free_bytes((128 * 1024 * 32) - 128);
+    check_num_meta_data_bytes(40 * 41);
+}
+
+void test2malloc1afteranotherwithfreeandrealloc() {
+    int *p = (int *)smalloc(sizeof(int));
+    *p = 10;
+    std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
+    int *q = (int *)smalloc(sizeof(int));
+    *q = 10;
+    std::cout << "2 smalloc " << (q == NULL ? "fail" : "success!") << std::endl;
+    sfree(p);
+    int *r = (int *)srealloc(q, 2 * sizeof(int));
+    *r = 10;
+    std::cout << "1 srealloc " << (r == NULL ? "fail" : "success!") << std::endl;
+    check_num_allocated_blocks(41);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(39);
+    check_num_free_bytes((128 * 1024 * 32) - 384);
+    check_num_meta_data_bytes(40 * 40);
+}
+
+void test2malloc1afteranotherwithfreeandreallocandcalloc(){
+    int *p = (int *)smalloc(sizeof(int));
+    *p = 10;
+    std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
+    int *q = (int *)smalloc(sizeof(int));
+    *q = 10;
+    std::cout << "2 smalloc " << (q == NULL ? "fail" : "success!") << std::endl;
+    sfree(p);
+    int *r = (int *)srealloc(q, 2 * sizeof(int));
+    *r = 10;
+    std::cout << "1 srealloc " << (r == NULL ? "fail" : "success!") << std::endl;
+    int *s = (int *)scalloc(5, sizeof(int));
+    if (s == NULL)
+    {
+        std::cout << "Scalloc Test Failed!" << std::endl;
+        std::cout << "Got NULL" << std::endl;
+    }
+    else
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            if (s[i] != 0)
+            {
+                std::cout << "Scalloc Test Failed!" << std::endl;
+                std::cout << "Expected: 0" << std::endl;
+                std::cout << "Got: " << s[i] << std::endl;
+                break;
+            }
+        }
+    }
+    std::cout << "Scalloc Test Passed!" << std::endl;
+    check_num_allocated_blocks(41);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(38);
+    check_num_free_bytes((128 * 1024 * 32) - 384);
+    check_num_meta_data_bytes(40 * 40);
+}
+
 int main(int argc, char const *argv[])
 {
-    basicTests();
+    std::cout << "|-----------------------------------|" << std::endl;
+    std::cout<< std::endl  << "2 malloc 1 after another" << std::endl;
+    test2malloc1afteranother();
+    std::cout << std::endl << "|-----------------------------------|" << std::endl;
+    std::cout << "2 malloc 1 after another with free" << std::endl;
+    test2malloc1afteranotherwithfree();
+    std::cout << std::endl << "|-----------------------------------|" << std::endl;
+    std::cout << "2 malloc 1 after another with free and realloc" << std::endl;
+    test2malloc1afteranotherwithfreeandrealloc();
+    std::cout << std::endl << "|-----------------------------------|" << std::endl;
+    std::cout << "2 malloc 1 after another with free and realloc and calloc" << std::endl;
+    test2malloc1afteranotherwithfreeandreallocandcalloc();
+    std::cout << std::endl << "|-----------------------------------|" << std::endl;
+    std::cout << "|-----------------------------------|" << std::endl;
+    std::cout << "surroundingTest Tests" << std::endl;
+    surroundingTest();
     return 0;
 }
