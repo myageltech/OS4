@@ -78,9 +78,9 @@ public:
     void operator=(MallocManager const &) = delete;
     static MallocManager &getInstance()
     {
-        std::cout << "get instance" << std::endl;
+        // std::cout << "get instance" << std::endl;
         static MallocManager instance;
-        std::cout << "after get instance" << std::endl;
+        // std::cout << "after get instance" << std::endl;
         return instance;
     }
     ~MallocManager() = default;
@@ -128,27 +128,27 @@ int powerOfBase(int power)
 
 void tasteCookie(MallocMetadata *block)
 {
-    std::cout << "taste cookie" << std::endl;
+    // std::cout << "taste cookie" << std::endl;
     if (block->cookies != MallocManager::getInstance().major_cookie)
     {
-        std::cout << "cookie: " << block->cookies << std::endl;
+        // std::cout << "cookie: " << block->cookies << std::endl;
         exit(0xdeadbeef);
     }
-    std::cout << "after taste cookie" << std::endl;
+    // std::cout << "after taste cookie" << std::endl;
 }
 
 int getOrder(size_t size)
 {
-    std::cout << "get order: " << size << std::endl;
+    // std::cout << "get order: " << size << std::endl;
     int order = MIN_ORDER;
     while (size + _size_meta_data() > BASE_BLOCK_SIZE * powerOfBase(order))
     {
-        std::cout << "get order: " << size << std::endl;
-        std::cout << "get order: " << BASE_BLOCK_SIZE * powerOfBase(order) << std::endl;
+        // std::cout << "get order: " << size << std::endl;
+        // std::cout << "get order: " << BASE_BLOCK_SIZE * powerOfBase(order) << std::endl;
 
         order++;
     }
-    std::cout << "get order: " << order << std::endl;
+    // std::cout << "get order: " << order << std::endl;
     return order;
 }
 
@@ -184,7 +184,7 @@ MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
     tasteCookie(bigger_block);
     // split the block into 2 insert them to the small order list delete the bigger block from the bigger order list and return the first block
     MallocMetadata *first_block = bigger_block;
-    std::cout << "first block: " << first_block << std::endl;
+    // std::cout << "first block: " << first_block << std::endl;
     MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + bigger_block->size / BASE);
     // MallocMetadata *second_block = (MallocMetadata *)((char *)bigger_block + (INITIAL_BLOCK_SIZE * powerOfBase(order)));
     second_block->cookies = first_block->cookies;
@@ -316,17 +316,17 @@ int buddiesMergeCounter(MallocMetadata *old_block, size_t size)
 
 void *smalloc(size_t size)
 {
-    std::cout << "smalloc: " << size << std::endl;
+    // std::cout << "smalloc: " << size << std::endl;
     if (!SIZE_CHECK_LIMIT(size))
     {
         return NULL;
     }
-    std::cout << "smalloc: " << size << std::endl;
+    // std::cout << "smalloc: " << size << std::endl;
     MallocManager &manager = MallocManager::getInstance();
-    std::cout << "after get instance" << std::endl;
+    // std::cout << "after get instance" << std::endl;
     int order = getOrder(size);
-    std::cout << "after get order" << std::endl;
-    std::cout << "order: " << order << std::endl;
+    // std::cout << "after get order" << std::endl;
+    // std::cout << "order: " << order << std::endl;
     if (order > MAX_ORDER) // size is too big so need mmap()
     {
         MallocMetadata *block = (MallocMetadata *)mmap(nullptr, size + _size_meta_data(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -338,8 +338,8 @@ void *smalloc(size_t size)
         manager._num_meta_data_bytes += _size_meta_data();
         return (void *)((char *)block + _size_meta_data());
     }
-    std::cout << "found that the size is less then 128 KB" << std::endl;
-    // return a block from the free list
+    // std::cout << "found that the size is less then 128 KB" << std::endl;
+    //  return a block from the free list
     if (!manager.free_list[order])
     {
         manager._num_free_bytes -= BASE_BLOCK_SIZE * powerOfBase(order);
@@ -349,18 +349,18 @@ void *smalloc(size_t size)
     {
         manager._num_free_bytes += BASE_BLOCK_SIZE * powerOfBase(order);
     }
-    std::cout << "after get block by order" << std::endl;
+    // std::cout << "after get block by order" << std::endl;
     if (block == nullptr)
     {
         return nullptr;
     }
-    std::cout << "found a block in the free list" << std::endl;
+    // std::cout << "found a block in the free list" << std::endl;
     tasteCookie(block);
-    std::cout << "after taste cookie" << std::endl;
+    // std::cout << "after taste cookie" << std::endl;
     block->is_free = false;
     manager._num_free_blocks--;
     manager._num_free_bytes -= block->size;
-    std::cout << "before return" << std::endl;
+    // std::cout << "before return" << std::endl;
     return (void *)((char *)block + _size_meta_data());
 }
 
