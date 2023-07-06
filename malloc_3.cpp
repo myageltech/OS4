@@ -58,6 +58,7 @@ private:
         // _num_allocated_blocks = INITIAL_BLOCKS;
         // _num_allocated_bytes = INITIAL_BLOCK_SIZE * INITIAL_BLOCKS;
         _num_meta_data_bytes = INITIAL_BLOCKS * _size_meta_data();
+        std::cout << "First c'tor: num free blocks:" << _num_free_blocks << std::endl;
     }
 
 public:
