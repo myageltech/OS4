@@ -48,6 +48,11 @@ void check_num_meta_data_bytes(int expected){
 
 void surroundingTest() {
   // test smalloc
+    check_num_allocated_blocks(32);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(32);
+    check_num_free_bytes((128 * 1024 * 32) );
+    check_num_meta_data_bytes(40 * 32);
     std::cout << "|-----------------------------------|" << std::endl<< "Smalloc Test" << std::endl;
     int *p = (int *)smalloc(sizeof(int));
     *p = 10;
