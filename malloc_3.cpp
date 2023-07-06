@@ -202,7 +202,7 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
         return block;
     }
     MallocMetadata *buddy = (MallocMetadata *)((unsigned long)block ^ ((MallocMetadata *)block)->size);
-    tastesCookie(buddy);
+    tasteCookie(buddy);
     if (buddy->is_free)
     {
         removeBlockFromFreeList(buddy);
