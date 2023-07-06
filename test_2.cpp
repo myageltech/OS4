@@ -109,7 +109,7 @@ void tests2smalloc1sfree1srealloc(){
     check_num_allocated_blocks(3);
     check_num_allocated_bytes(4*sizeof(int));
     check_num_free_blocks(2);
-    check_num_free_bytes(sizeof(int));
+    check_num_free_bytes(2*sizeof(int));
     check_num_meta_data_bytes(32*3);
     sfree(r);
 }
