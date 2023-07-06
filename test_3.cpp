@@ -18,6 +18,17 @@ int main(int argc, char const *argv[])
         std::cout << "Smalloc Test Failed!" << std::endl;
         std::cout << "got NULL" << std::endl;
     }
+    if(_num_free_blocks() == 41)
+    {
+        std::cout << "num_free_block Smalloc passed sucdcess!" << std::endl;
+    }
+    else{
+                std::cout << "Smalloc Fail! chek it!" << std::endl;
+                std::cout << "bumber of free block is: " << _num_free_blocks() << std::endl;
+                std::cout << "but should be 41" <<std::endl;
+                exit(2);
+
+    }
     else if (*p != 10)
     {
         std::cout << "Smalloc Test Failed!" << std::endl;
@@ -33,16 +44,16 @@ int main(int argc, char const *argv[])
     // test sfree
     std::cout << "|-----------------------------------|" << std::endl;
     std::cout << "Sfree Test" << std::endl;
-    sfree(p);
-    if (p != NULL)
+    if(_num_free_blocks() == 32)
     {
-        std::cout << "Sfree Test Failed!" << std::endl;
-        std::cout << "Expected: NULL" << std::endl;
-        std::cout << "Got: " << p << std::endl;
+        std::cout << "Sfree passed sucdcess!" << std::endl;
     }
     else{
+                std::cout << "Sfree Fail! chek it!" << std::endl;
+                std::cout << "bumber of free block is: " << _num_free_blocks() << std::endl;
+                std::cout << "but should be 32" <<std::endl;
+                exit(2);
 
-    std::cout << "Sfree Test Passed!" << std::endl;
     }
     std::cout << "|-----------------------------------|" << std::endl;
     std::cout << "the size should be" << sizeof(int) << std::endl;
