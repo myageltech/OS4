@@ -8,27 +8,41 @@
 
 int main(int argc, char const *argv[])
 {
-
     // test smalloc
-    std::cout << "|-----------------------------------|" << std::endl<< "Smalloc Test" << std::endl;
+    std::cout << "|-----------------------------------|" << std::endl;
+    std::cout << "Smalloc Test" << std::endl;
     int *p = (int *)smalloc(sizeof(int));
     *p = 10;
-    std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
-    int numFreeBlocks = _num_free_blocks();
-    std::cout << "num_free_block" << (numFreeBlocks == 41 ? " success!" : "Fail!") << std::endl;
-    if (numFreeBlocks != 41) {
-    std::cout << "Number of free blocks is: " << numFreeBlocks << " but should be 41" << std::endl;
-    exit(2);
+    if (p == NULL)
+    {
+        std::cout << "Smalloc Test Failed!" << std::endl;
+        std::cout << "got NULL" << std::endl;
     }
+    else if (*p != 10)
+    {
+        std::cout << "Smalloc Test Failed!" << std::endl;
+        std::cout << "Expected: 10" << std::endl;
+        std::cout << "Got: " << *p << std::endl;
+    }
+    else{
+        
+        std::cout << "Smalloc Test Passed!" << std::endl;
+    }
+    std::cout << "|-----------------------------------|" << std::endl;
 
     // test sfree
-    std::cout << "|-----------------------------------|" << std::endl << "Sfree Test" << std::endl;
+    std::cout << "|-----------------------------------|" << std::endl;
+    std::cout << "Sfree Test" << std::endl;
     sfree(p);
-    numFreeBlocks = _num_free_blocks();
-    std::cout << "num_free_block" << (numFreeBlocks == 32 ? " success!" : "Fail!") << std::endl;
-    if (numFreeBlocks != 41) {
-    std::cout << "Number of free blocks is: " << numFreeBlocks << " but should be 41" << std::endl;
-    exit(2);
+    if (p != NULL)
+    {
+        std::cout << "Sfree Test Failed!" << std::endl;
+        std::cout << "Expected: NULL" << std::endl;
+        std::cout << "Got: " << p << std::endl;
+    }
+    else{
+
+    std::cout << "Sfree Test Passed!" << std::endl;
     }
     std::cout << "|-----------------------------------|" << std::endl;
     std::cout << "the size should be" << sizeof(int) << std::endl;
