@@ -139,6 +139,7 @@ void surroundingTest() {
         std::cout << "Expected: NULL" << std::endl;
         std::cout << "Got: " << s << std::endl;
     }
+    sfree(r);
 }
 
 void test2malloc1afteranother(){
