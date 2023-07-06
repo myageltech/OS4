@@ -212,8 +212,9 @@ MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
     second_block->is_free = true;
     second_block->prev = second_block->next = nullptr;
     first_block->prev = first_block->next = nullptr;
-    blocks_list[order] = second_block;
-    manager._num_free_blocks++;
+    addBlockToFreeList(second_block);
+    // blocks_list[order] = second_block;
+    // manager._num_free_blocks++;
     manager._num_allocated_blocks++;
     manager._num_meta_data_bytes += _size_meta_data();
     return first_block;
@@ -238,10 +239,10 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
         }
         else
         {
+            tasteCookie(manager.free_list[order]);
             block->next = manager.free_list[order];
-            tasteCookie(block->next);
+            block->next->prev = block;
             block->prev = nullptr;
-            manager.free_list[order]->prev = block;
             manager.free_list[order] = block;
         }
         return block;
@@ -261,7 +262,6 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
     else
     {
         manager._num_free_blocks++;
-        manager._num_free_bytes += block->size;
         // add block to free list
         if (manager.free_list[order] == nullptr)
         {
@@ -271,10 +271,10 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
         }
         else
         {
+            tasteCookie(manager.free_list[order]);
             block->next = manager.free_list[order];
-            tasteCookie(block->next);
+            block->next->prev = block;
             block->prev = nullptr;
-            manager.free_list[order]->prev = block;
             manager.free_list[order] = block;
         }
         return block;
