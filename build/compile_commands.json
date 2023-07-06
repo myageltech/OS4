@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build",
+  "command": "/usr/bin/clang++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.3.sdk -std=gnu++11 -o CMakeFiles/OS4_2.dir/test_2.cpp.o -c /Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/test_2.cpp",
+  "file": "/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/test_2.cpp"
+},
+{
+  "directory": "/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/build",
+  "command": "/usr/bin/clang++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.3.sdk -std=gnu++11 -o CMakeFiles/OS4_2.dir/malloc_2.cpp.o -c /Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/malloc_2.cpp",
+  "file": "/Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw4/hw4wet/malloc_2.cpp"
+}
+]

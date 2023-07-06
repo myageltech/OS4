@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-project(OS4_3)
+project(OS4_2)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -9,8 +9,8 @@ set (PROJECT_HEADERS
 )
 
 set (PROJECT_SOURCES
-    test_3.cpp
-    malloc_3.cpp 
+    test_2.cpp
+    malloc_2.cpp 
 )
 
-add_executable(OS4_3 ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+add_executable(OS4_2 ${PROJECT_SOURCES} ${PROJECT_HEADERS})

@@ -67,7 +67,7 @@ CMAKE_BINARY_DIR = /Users/yagelmaimon/Desktop/technion/operatingsystem/my_hws/hw
 
 # Special rule for the target edit_cache
 edit_cache:
-	@echo "Running CMake cache editor..."
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
 	/usr/local/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
@@ -77,7 +77,7 @@ edit_cache/fast: edit_cache
 
 # Special rule for the target rebuild_cache
 rebuild_cache:
-	@echo "Running CMake to regenerate build system..."
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
 	/usr/local/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
@@ -116,6 +116,67 @@ depend:
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
+#=============================================================================
+# Target rules for targets named OS4_2
+
+# Build rule for target.
+OS4_2: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 OS4_2
+.PHONY : OS4_2
+
+# fast build rule for target.
+OS4_2/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OS4_2.dir/build.make CMakeFiles/OS4_2.dir/build
+.PHONY : OS4_2/fast
+
+malloc_2.o: malloc_2.cpp.o
+.PHONY : malloc_2.o
+
+# target to build an object file
+malloc_2.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OS4_2.dir/build.make CMakeFiles/OS4_2.dir/malloc_2.cpp.o
+.PHONY : malloc_2.cpp.o
+
+malloc_2.i: malloc_2.cpp.i
+.PHONY : malloc_2.i
+
+# target to preprocess a source file
+malloc_2.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OS4_2.dir/build.make CMakeFiles/OS4_2.dir/malloc_2.cpp.i
+.PHONY : malloc_2.cpp.i
+
+malloc_2.s: malloc_2.cpp.s
+.PHONY : malloc_2.s
+
+# target to generate assembly for a file
+malloc_2.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OS4_2.dir/build.make CMakeFiles/OS4_2.dir/malloc_2.cpp.s
+.PHONY : malloc_2.cpp.s
+
+test_2.o: test_2.cpp.o
+.PHONY : test_2.o
+
+# target to build an object file
+test_2.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OS4_2.dir/build.make CMakeFiles/OS4_2.dir/test_2.cpp.o
+.PHONY : test_2.cpp.o
+
+test_2.i: test_2.cpp.i
+.PHONY : test_2.i
+
+# target to preprocess a source file
+test_2.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OS4_2.dir/build.make CMakeFiles/OS4_2.dir/test_2.cpp.i
+.PHONY : test_2.cpp.i
+
+test_2.s: test_2.cpp.s
+.PHONY : test_2.s
+
+# target to generate assembly for a file
+test_2.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OS4_2.dir/build.make CMakeFiles/OS4_2.dir/test_2.cpp.s
+.PHONY : test_2.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -124,6 +185,13 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... OS4_2"
+	@echo "... malloc_2.o"
+	@echo "... malloc_2.i"
+	@echo "... malloc_2.s"
+	@echo "... test_2.o"
+	@echo "... test_2.i"
+	@echo "... test_2.s"
 .PHONY : help
 
 
