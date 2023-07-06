@@ -15,7 +15,8 @@ typedef struct MallocMetadata
 class MallocManager
 {
 private:
-    MallocManager() : head(nullptr), tail(nullptr), _num_free_blocks(0), _num_free_bytes(0), _num_allocated_blocks(0), _num_allocated_bytes(0), _num_meta_data_bytes(0) {}
+    MallocManager() : head(nullptr), tail(nullptr), _num_free_blocks(0), _num_free_bytes(0),
+                      _num_allocated_blocks(0), _num_allocated_bytes(0), _num_meta_data_bytes(0) {}
     static MallocMetadata &instance;
 
 public:
@@ -53,7 +54,7 @@ void *smalloc(size_t size)
             MallocManager &manager = MallocManager::getInstance();
             manager._num_free_blocks--;
             manager._num_free_bytes -= temp->size;
-            return (void *)((char *)temp + _size_meta_data());
+            return (void *)((MallocMetadata *)temp + 1);
         }
         temp = temp->next;
     }
@@ -79,7 +80,7 @@ void *smalloc(size_t size)
     MallocManager::getInstance()._num_allocated_blocks++;
     MallocManager::getInstance()._num_allocated_bytes += size;
     MallocManager::getInstance()._num_meta_data_bytes += _size_meta_data();
-    return (void *)((char *)new_block + _size_meta_data());
+    return (void *)((MallocMetadata *)temp + 1);
 }
 
 void *scalloc(size_t num, size_t size)
@@ -99,7 +100,7 @@ void sfree(void *p)
     {
         return;
     }
-    MallocMetadata *temp = (MallocMetadata *)((char *)p - _size_meta_data());
+    MallocMetadata *temp = (MallocMetadata *)((MallocMetadata *)p - 1);
     if (temp->is_free)
     {
         return;
@@ -117,7 +118,7 @@ void *srealloc(void *oldp, size_t size)
     {
         return smalloc(size);
     }
-    MallocMetadata *temp = (MallocMetadata *)((char *)oldp - _size_meta_data());
+    MallocMetadata *temp = (MallocMetadata *)((MallocMetadata *)oldp - 1);
     if (temp->size >= size)
     {
         return oldp;
@@ -127,7 +128,7 @@ void *srealloc(void *oldp, size_t size)
     {
         return NULL;
     }
-    memcpy(newp, oldp, temp->size);
+    memmove(newp, oldp, temp->size);
     sfree(oldp);
     return newp;
 }
@@ -161,5 +162,3 @@ size_t _size_meta_data()
 {
     return sizeof(MallocMetadata);
 }
-
-// Path: malloc_2.cpp

@@ -19,5 +19,3 @@ void *smalloc(size_t size)
         return p;
     }
 }
-
-// path: malloc_1.cpp
