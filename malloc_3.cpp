@@ -212,6 +212,7 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
     {
         removeBlockFromFreeList(buddy);
         block->size *= BASE;
+        manager._num_allocated_blocks--;
         manager._num_meta_data_bytes -= _size_meta_data();
         return addBlockToFreeList((MallocMetadata *)block);
     }
