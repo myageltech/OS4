@@ -321,6 +321,7 @@ void *smalloc(size_t size)
     block->is_free = false;
     // manager._num_free_blocks--;
     manager._num_free_bytes -= block->size;
+    std::cout << "smalloc: num free blocks:" << manager._num_free_blocks << std::endl;
     return (void *)(block + 1);
 }
 
