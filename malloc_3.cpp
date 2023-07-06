@@ -315,12 +315,14 @@ void *smalloc(size_t size)
         MallocMetadata *block = (MallocMetadata *)mmap(nullptr, size + _size_meta_data(), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         MallocMetadata temp = {MallocManager::getInstance().major_cookie,
                                (unsigned long)size + _size_meta_data(), false,
-                               manager.head_map, nullptr};
+                               nullptr, nullptr};
         *block = temp;
+        block->next = manager.head_map;
         manager.head_map = block;
         manager._num_allocated_blocks++;
         manager._num_allocated_bytes += size + _size_meta_data();
         manager._num_meta_data_bytes += _size_meta_data();
+        block->is_free = false;
         return (void *)(block + 1);
     }
     MallocMetadata *block = getBlockByOrder(manager.free_list, order);
@@ -389,7 +391,7 @@ void *srealloc(void *oldp, size_t size)
     {
         return smalloc(size);
     }
-    MallocMetadata *old_block = (MallocMetadata *)((char *)oldp - _size_meta_data());
+    MallocMetadata *old_block = (MallocMetadata *)((MallocMetadata *)oldp - 1);
     tasteCookie(old_block);
     if (old_block->size >= size + _size_meta_data())
     {
