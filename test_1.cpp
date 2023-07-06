@@ -21,10 +21,7 @@ void smalloc_test()
         std::cout << "smalloc fail" << std::endl;
         exit(2);
     }
-    std::cout << "so! fucking! long ma bitcheees!!!!" < std::endl;
-    
-    
-    
+    std::cout << "so! fucking! long ma bitcheees!!!!" << std::endl;
 }
 
 int main(int argc, char const *argv[])
