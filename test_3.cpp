@@ -267,7 +267,7 @@ void scallochigherthen128KB(){
     int *p = (int *)scalloc(2, 128 * 1024);
     std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
     check_num_allocated_blocks(33);
-    check_num_allocated_bytes(128 * 1024 * 32 + 128 * 1024 + 1 + 40);
+    check_num_allocated_bytes(128 * 1024 * 32 + 128 * (2* 128 * 1024) + 40);
     check_num_free_blocks(32);
     check_num_free_bytes((128 * 1024 * 32));
     check_num_meta_data_bytes(40 * 33);
