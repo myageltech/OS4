@@ -9,7 +9,7 @@
 void check_num_allocated_blocks(int expected){
     std::cout << "check_num_allocated_blocks" << (_num_allocated_blocks() == expected ? " success!" : "Fail!") << std::endl;
     if (_num_allocated_blocks() != expected) {
-    std::cout << "Number of allocated blocks is: " << _num_allocated_blocks() << " but should be" << expected << std::endl;
+    std::cout << "Number of allocated blocks is: " << _num_allocated_blocks() << " but should be: " << expected << std::endl;
     exit(2);
     }
 }
@@ -17,7 +17,7 @@ void check_num_allocated_blocks(int expected){
 void check_num_allocated_bytes(int expected){
     std::cout << "check_num_allocated_bytes" << (_num_allocated_bytes() == expected ? " success!" : "Fail!") << std::endl;
     if (_num_allocated_bytes() != expected) {
-    std::cout << "Number of allocated blocks is: " << _num_allocated_bytes() << " but should be" << expected << std::endl;
+    std::cout << "number of allocated bytes: " << _num_allocated_bytes() << " but should be: " << expected << std::endl;
     exit(2);
     }
 }
@@ -25,7 +25,7 @@ void check_num_allocated_bytes(int expected){
 void check_num_free_blocks(int expected){
     std::cout << "check_num_free_blocks" << (_num_free_blocks() == expected ? " success!" : "Fail!") << std::endl;
     if (_num_free_blocks() != expected) {
-    std::cout << "Number of allocated blocks is: " << _num_free_blocks() << " but should be" << expected << std::endl;
+    std::cout << "number of free block : " << _num_free_blocks() << " but should be: " << expected << std::endl;
     exit(2);
     }
 }
@@ -33,7 +33,7 @@ void check_num_free_blocks(int expected){
 void check_num_free_bytes(int expected){
     std::cout << "check_num_free_bytes" << (_num_free_bytes() == expected ? " success!" : "Fail!") << std::endl;
     if (_num_free_bytes() != expected) {
-    std::cout << "Number of allocated blocks is: " << _num_free_bytes() << " but should be" << expected << std::endl;
+    std::cout << "number of free bytes: " << _num_free_bytes() << " but should be: " << expected << std::endl;
     exit(2);
     }
 }
@@ -41,21 +41,19 @@ void check_num_free_bytes(int expected){
 void check_num_meta_data_bytes(int expected){
     std::cout << "check_num_meta_data_bytes" << (_num_meta_data_bytes() == expected ? " success!" : "Fail!") << std::endl;
     if (_num_meta_data_bytes() != expected) {
-    std::cout << "Number of allocated blocks is: " << _num_meta_data_bytes() << " but should be" << expected << std::endl;
+    std::cout << "number of meta_data byte: " << _num_meta_data_bytes() << " but should be: " << expected << std::endl;
     exit(2);
     }
 }
 
-int main(int argc, char const *argv[])
-{
-
-    // test smalloc
+void basicTests() {
+  // test smalloc
     std::cout << "|-----------------------------------|" << std::endl<< "Smalloc Test" << std::endl;
     int *p = (int *)smalloc(sizeof(int));
     *p = 10;
     std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
 
-    check_num_allocated_blocks(41);
+    check_num_allocated_blocks(42);
     check_num_allocated_bytes(128 * 1024 * 32);
     check_num_free_blocks(41);
     check_num_free_bytes((128 * 1024 * 32) - 128);
@@ -65,9 +63,9 @@ int main(int argc, char const *argv[])
     std::cout << "|-----------------------------------|" << std::endl << "Sfree Test" << std::endl;
     sfree(p);
     
-    check_num_allocated_blocks(41);
+    check_num_allocated_blocks(32);
     check_num_allocated_bytes(128 * 1024 * 32);
-    check_num_free_blocks(41);
+    check_num_free_blocks(32);
     check_num_free_bytes((128 * 1024 * 32) - 128);
     check_num_meta_data_bytes(40 * 32);
 
@@ -193,7 +191,11 @@ int main(int argc, char const *argv[])
         std::cout << "Smalloc Test Passed!" << std::endl;
     }
     std::cout << "|-----------------------------------|" << std::endl;
+}
 
-
+int main(int argc, char const *argv[])
+{
+    basicTests();
+  
     return 0;
 }
