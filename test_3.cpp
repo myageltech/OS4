@@ -249,14 +249,14 @@ void test2malloc1afteranotherwithfreeandreallocandcalloc(){
     int *p = (int *)smalloc(sizeof(int));
     *p = 10;
     std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
-    int *q = (int *)smalloc(sizeof(int));
+    int *q = (int *)smalloc(sizeof(int)); // free 40 alloc 42
     *q = 10;
     std::cout << "2 smalloc " << (q == NULL ? "fail" : "success!") << std::endl;
-    sfree(p);
-    int *r = (int *)srealloc(q, 2 * sizeof(int));
+    sfree(p); // alloc 42 free 41
+    int *r = (int *)srealloc(q, 2 * sizeof(int)); // alloc 42 free 41
     *r = 10;
     std::cout << "1 srealloc " << (r == NULL ? "fail" : "success!") << std::endl;
-    int *s = (int *)scalloc(5, sizeof(int));
+    int *s = (int *)scalloc(5, sizeof(int)); // alloc 42 free 40
     if (s == NULL)
     {
         std::cout << "Scalloc Test Failed!" << std::endl;
@@ -278,8 +278,8 @@ void test2malloc1afteranotherwithfreeandreallocandcalloc(){
     std::cout << "Scalloc Test Passed!" << std::endl;
     check_num_allocated_blocks(42);
     check_num_allocated_bytes(128 * 1024 * 32);
-    check_num_free_blocks(38);
-    check_num_free_bytes((128 * 1024 * 32) - 384);
+    check_num_free_blocks(40);
+    check_num_free_bytes((128 * 1024 * 32) - 128*2);
     check_num_meta_data_bytes(40 * 42);
     sfree(r);
     sfree(s);
