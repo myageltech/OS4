@@ -169,6 +169,7 @@ MallocMetadata *getBlockByOrder(MallocMetadata **blocks_list, int order)
     {
         MallocMetadata *temp = blocks_list[order];
         blocks_list[order] = blocks_list[order]->next;
+        temp->next = temp->prev = nullptr;
         temp->is_free = false;
         return temp;
     }
@@ -363,7 +364,8 @@ void *smalloc(size_t size)
     manager._num_free_blocks--;
     manager._num_free_bytes -= block->size;
     // std::cout << "before return" << std::endl;
-    return (void *)((char *)block + _size_meta_data());
+    // return (void *)((char *)block + _size_meta_data());
+    return (void *)(block + 1);
 }
 
 void *scalloc(size_t num, size_t size)
@@ -381,7 +383,7 @@ void sfree(void *p)
 {
     // MallocMetadata *block = (MallocMetadata *)((char *)p - _size_meta_data());
     MallocMetadata *block = (MallocMetadata *)(p);
-    block = p - 1;
+    block = block - 1;
     tasteCookie(block);
     MallocManager &manager = MallocManager::getInstance();
     // delete the block from the heap and from the list inside manager
