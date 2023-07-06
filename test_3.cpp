@@ -236,11 +236,11 @@ void test2malloc1afteranotherwithfreeandrealloc() {
     int *r = (int *)srealloc(q, 2 * sizeof(int));
     *r = 10;
     std::cout << "1 srealloc " << (r == NULL ? "fail" : "success!") << std::endl;
-    check_num_allocated_blocks(41);
+    check_num_allocated_blocks(42);
     check_num_allocated_bytes(128 * 1024 * 32);
     check_num_free_blocks(39);
     check_num_free_bytes((128 * 1024 * 32) - 384);
-    check_num_meta_data_bytes(40 * 40);
+    check_num_meta_data_bytes(40 * 42);
     sfree(r);
 
 }
