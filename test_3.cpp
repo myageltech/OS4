@@ -278,8 +278,23 @@ void test2malloc1afteranotherwithfreeandreallocandcalloc(){
     check_num_meta_data_bytes(40 * 40);
 }
 
+void testsmalloc(){
+    int *p = (int *)smalloc(sizeof(int));
+    *p = 10;
+    std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
+    check_num_allocated_blocks(42);
+    check_num_allocated_bytes(128 * 1024 * 32);
+    check_num_free_blocks(41);
+    check_num_free_bytes((128 * 1024 * 32) - 128);
+    check_num_meta_data_bytes(40 * 41);
+}
+
 int main(int argc, char const *argv[])
 {
+    std::cout << "test_3" << std::endl;
+    std::cout << "|-----------------------------------|" << std::endl;
+    std::cout << "smalloc Test" << std::endl;
+    testsmalloc();
     std::cout << "|-----------------------------------|" << std::endl;
     std::cout<< std::endl  << "2 malloc 1 after another" << std::endl;
     test2malloc1afteranother();
