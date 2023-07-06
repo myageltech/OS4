@@ -27,8 +27,9 @@ typedef struct MallocMetadata
 class MallocManager
 {
 private:
-    MallocManager() : major_cookie(0), head_map(nullptr), /*tail_map(nullptr),*/ _num_free_blocks(0), _num_free_bytes(0),
-                      _num_allocated_blocks(0), _num_allocated_bytes(0), _num_meta_data_bytes(0)
+    MallocManager() : major_cookie(0), head_map(nullptr), _num_free_blocks(INITIAL_BLOCKS),
+                      _num_free_bytes(INITIAL_BLOCKS * INITIAL_BLOCK_SIZE), _num_allocated_blocks(INITIAL_BLOCKS),
+                      _num_allocated_bytes(INITIAL_BLOCKS * INITIAL_BLOCK_SIZE), _num_meta_data_bytes(0)
     {
         major_cookie = rand();
         for (int i = 0; i < MAX_ORDER + 1; i++)
@@ -52,19 +53,16 @@ private:
             new_block->next = (i == INITIAL_BLOCKS - 1) ? nullptr : new_block + 1;
             new_block = new_block->next;
         }
-        _num_free_blocks = INITIAL_BLOCKS;
-        _num_free_bytes = INITIAL_BLOCK_SIZE * INITIAL_BLOCKS;
-        _num_allocated_blocks = INITIAL_BLOCKS;
-        _num_allocated_bytes = INITIAL_BLOCK_SIZE * INITIAL_BLOCKS;
+        // _num_free_blocks = INITIAL_BLOCKS;
+        // _num_free_bytes = INITIAL_BLOCK_SIZE * INITIAL_BLOCKS;
+        // _num_allocated_blocks = INITIAL_BLOCKS;
+        // _num_allocated_bytes = INITIAL_BLOCK_SIZE * INITIAL_BLOCKS;
         _num_meta_data_bytes = INITIAL_BLOCKS * _size_meta_data();
     }
-
-    // static MallocManager &instance;
 
 public:
     int major_cookie;
     MallocMetadata *head_map;
-    // MallocMetadata *tail_map;
 
     MallocMetadata *free_list[MAX_ORDER + 1];
 
