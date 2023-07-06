@@ -54,7 +54,7 @@ void testsmalloc(){
     check_num_allocated_bytes(sizeof(int));
     check_num_free_blocks(0);
     check_num_free_bytes(0);
-    check_num_meta_data_bytes(40);
+    check_num_meta_data_bytes(32);
     sfree(p);
 }
 
@@ -69,9 +69,14 @@ void tests2smalloc(){
     check_num_allocated_bytes(2*sizeof(int));
     check_num_free_blocks(0);
     check_num_free_bytes(0);
-    check_num_meta_data_bytes(40*2);
+    check_num_meta_data_bytes(32*2);
     sfree(p);
     sfree(q);
+    check_num_allocated_blocks(2);
+    check_num_allocated_bytes(2*sizeof(int));
+    check_num_free_blocks(2);
+    check_num_free_bytes(2*sizeof(int));
+    check_num_meta_data_bytes(32*2);
 }
 
 void tests2smalloc1sfree(){
@@ -86,7 +91,7 @@ void tests2smalloc1sfree(){
     check_num_allocated_bytes(2*sizeof(int));
     check_num_free_blocks(1);
     check_num_free_bytes(sizeof(int));
-    check_num_meta_data_bytes(40*2);
+    check_num_meta_data_bytes(32*2);
     sfree(q);
 }
 
@@ -101,11 +106,11 @@ void tests2smalloc1sfree1srealloc(){
     int *r = (int *)srealloc(q, 2 * sizeof(int));
     *r = 10;
     std::cout << "1 srealloc " << (r == NULL ? "fail" : "success!") << std::endl;
-    check_num_allocated_blocks(2);
-    check_num_allocated_bytes(2*sizeof(int));
+    check_num_allocated_blocks(3);
+    check_num_allocated_bytes(4*sizeof(int));
     check_num_free_blocks(1);
     check_num_free_bytes(sizeof(int));
-    check_num_meta_data_bytes(40*2);
+    check_num_meta_data_bytes(32*3);
     sfree(r);
 }
 
@@ -113,14 +118,14 @@ void tests2smalloc1sfree1srealloc1scalloc(){
     int *p = (int *)smalloc(sizeof(int));
     *p = 10;
     std::cout << "1 smalloc " << (p == NULL ? "fail" : "success!") << std::endl;
-    int *q = (int *)smalloc(sizeof(int)); // free 40 alloc 42
+    int *q = (int *)smalloc(sizeof(int)); // free 32 alloc 42
     *q = 10;
     std::cout << "2 smalloc " << (q == NULL ? "fail" : "success!") << std::endl;
     sfree(p); // alloc 42 free 41
     int *r = (int *)srealloc(q, 2 * sizeof(int)); // alloc 42 free 41
     *r = 10;
     std::cout << "1 srealloc " << (r == NULL ? "fail" : "success!") << std::endl;
-    int *s = (int *)scalloc(5, sizeof(int)); // alloc 42 free 40
+    int *s = (int *)scalloc(5, sizeof(int)); // alloc 42 free 32
     if (s == NULL)
     {
         std::cout << "Scalloc Test Failed!" << std::endl;
@@ -140,11 +145,11 @@ void tests2smalloc1sfree1srealloc1scalloc(){
         }
     }
     std::cout << "Scalloc Test Passed!" << std::endl;
-    check_num_allocated_blocks(2);
-    check_num_allocated_bytes(2*sizeof(int));
-    check_num_free_blocks(1);
-    check_num_free_bytes(sizeof(int));
-    check_num_meta_data_bytes(40*2);
+    check_num_allocated_blocks(4);
+    check_num_allocated_bytes(9*sizeof(int));
+    check_num_free_blocks(2);
+    check_num_free_bytes(2*sizeof(int));
+    check_num_meta_data_bytes(32*4);
     sfree(r);
     sfree(s);
 }
