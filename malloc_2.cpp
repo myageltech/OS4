@@ -110,7 +110,7 @@ void *smalloc(size_t size)
     MallocManager::getInstance()._num_allocated_blocks++;
     MallocManager::getInstance()._num_allocated_bytes += size;
     MallocManager::getInstance()._num_meta_data_bytes += _size_meta_data();
-    return (void *)((MallocMetadata *)temp + 1);
+    return (void *)((MallocMetadata *)new_block + 1);
 }
 
 void *scalloc(size_t num, size_t size)
