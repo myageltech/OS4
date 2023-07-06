@@ -286,7 +286,7 @@ void testsmalloc(){
     check_num_allocated_bytes(128 * 1024 * 32);
     check_num_free_blocks(41);
     check_num_free_bytes((128 * 1024 * 32) - 128);
-    check_num_meta_data_bytes(40 * 41);
+    check_num_meta_data_bytes(40 * 42);
 }
 
 int main(int argc, char const *argv[])
