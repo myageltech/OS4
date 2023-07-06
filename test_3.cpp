@@ -196,6 +196,5 @@ void basicTests() {
 int main(int argc, char const *argv[])
 {
     basicTests();
-  
     return 0;
 }
