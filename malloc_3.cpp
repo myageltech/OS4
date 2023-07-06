@@ -170,7 +170,9 @@ void removeBlockFromFreeList(MallocMetadata *block)
     {
         block->next->prev = block->prev;
     }
-    manager._num_free_blocks--;
+    std::cout << "before changing:" << manager._num_free_blocks << std::endl;
+    manager._num_free_blocks -= 1;
+    std::cout << "after changing:" << manager._num_free_blocks << std::endl;
     block->next = block->prev = nullptr;
     block->is_free = false;
     std::cout << "removeBlockFromFreeList: num free blocks:" << manager._num_free_blocks << std::endl;
