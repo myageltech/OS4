@@ -219,6 +219,7 @@ void removeBlockFromFreeList(MallocMetadata *block)
     }
     manager._num_free_blocks--;
     manager._num_free_bytes -= block->size;
+    std::cout << "removeBlockFromFreeList: num free blocks:" << manager._num_free_blocks << std::endl;
 }
 
 // join 2 blocks to one block and add them to the free list and use addBlockToFreeList recursively
@@ -231,6 +232,7 @@ MallocMetadata *addBlockToFreeList(MallocMetadata *block)
     {
         manager._num_free_blocks++;
         manager._num_free_bytes += block->size;
+        std::cout << "addBlockToFreeList MAX_ORDER: num free blocks:" << manager._num_free_blocks << std::endl;
         // add block to free list
         if (manager.free_list[order] == nullptr)
         {
@@ -377,7 +379,9 @@ void *scalloc(size_t num, size_t size)
 
 void sfree(void *p)
 {
-    MallocMetadata *block = (MallocMetadata *)((char *)p - _size_meta_data());
+    // MallocMetadata *block = (MallocMetadata *)((char *)p - _size_meta_data());
+    MallocMetadata *block = (MallocMetadata *)(p);
+    block = p - 1;
     tasteCookie(block);
     MallocManager &manager = MallocManager::getInstance();
     // delete the block from the heap and from the list inside manager
