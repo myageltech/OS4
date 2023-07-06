@@ -317,12 +317,10 @@ void *smalloc(size_t size)
                                (unsigned long)size + _size_meta_data(), false,
                                nullptr, nullptr};
         *block = temp;
-        block->next = manager.head_map;
         manager.head_map = block;
         manager._num_allocated_blocks++;
         manager._num_allocated_bytes += size + _size_meta_data();
         manager._num_meta_data_bytes += _size_meta_data();
-        block->is_free = false;
         return (void *)(block + 1);
     }
     MallocMetadata *block = getBlockByOrder(manager.free_list, order);
@@ -391,7 +389,7 @@ void *srealloc(void *oldp, size_t size)
     {
         return smalloc(size);
     }
-    MallocMetadata *old_block = (MallocMetadata *)((MallocMetadata *)oldp - 1);
+    MallocMetadata *old_block = (MallocMetadata *)((char *)oldp - _size_meta_data());
     tasteCookie(old_block);
     if (old_block->size >= size + _size_meta_data())
     {
