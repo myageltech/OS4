@@ -157,6 +157,7 @@ void removeBlockFromFreeList(MallocMetadata *block)
     tasteCookie(block);
     MallocManager &manager = MallocManager::getInstance();
     std::cout << "removeBlockFromFreeList: num free blocks:" << manager._num_free_blocks << std::endl;
+    std::cout << "before changing:" << manager._num_free_blocks << std::endl;
     int order = getOrder(block->size);
     if (block->prev == nullptr) // block is head
     {
@@ -170,9 +171,8 @@ void removeBlockFromFreeList(MallocMetadata *block)
     {
         block->next->prev = block->prev;
     }
-    std::cout << "before changing:" << manager._num_free_blocks << std::endl;
-    manager._num_free_blocks -= 1;
     std::cout << "after changing:" << manager._num_free_blocks << std::endl;
+    manager._num_free_blocks--;
     block->next = block->prev = nullptr;
     block->is_free = false;
     std::cout << "removeBlockFromFreeList: num free blocks:" << manager._num_free_blocks << std::endl;
