@@ -410,7 +410,7 @@ void *srealloc(void *oldp, size_t size)
         // smalloc new block
         void *newp = smalloc(size);
         // copy data
-        memset(oldp, 0, old_block->size);
+        memcpy(newp, oldp, old_block->size - _size_meta_data());
         // sfree old block
         sfree(oldp);
         return newp;
