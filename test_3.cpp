@@ -15,6 +15,7 @@ void check_num_allocated_blocks(int expected){
 }
 
 void check_num_allocated_bytes(int expected){
+    expected = expected - _num_meta_data_bytes();
     std::cout << "check_num_allocated_bytes" << (_num_allocated_bytes() == expected ? " success!" : "Fail!") << std::endl;
     if (_num_allocated_bytes() != expected) {
     std::cout << "number of allocated bytes: " << _num_allocated_bytes() << " but should be: " << expected << std::endl;
@@ -31,6 +32,7 @@ void check_num_free_blocks(int expected){
 }
 
 void check_num_free_bytes(int expected){
+    expected = expected - _num_meta_data_bytes();
     std::cout << "check_num_free_bytes" << (_num_free_bytes() == expected ? " success!" : "Fail!") << std::endl;
     if (_num_free_bytes() != expected) {
     std::cout << "number of free bytes: " << _num_free_bytes() << " but should be: " << expected << std::endl;
